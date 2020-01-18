@@ -6,7 +6,8 @@ class Client extends Model {
       {
         name: Sequelize.STRING,
         email: Sequelize.STRING,
-        password_hash: Sequelize.STRING,
+        plan_id: Sequelize.STRING,
+        subs_id: Sequelize.STRING,
       },
       { sequelize }
     );

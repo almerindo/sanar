@@ -13,11 +13,16 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: false,
       },
-      password_hash: {
+      plan_id: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
+      },
+      subs_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,

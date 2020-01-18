@@ -5,7 +5,7 @@ import SubscriberController from './app/controllers/SubscriberController';
 const routes = new Router();
 
 routes.post('/plan', PlanController.store);
-routes.post('/sub', SubscriberController.store2);
+routes.post('/sub', SubscriberController.store);
 
 routes.post('/customer', (req, res) => {
   return res.json({ id: 1 });
