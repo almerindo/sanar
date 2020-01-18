@@ -16,6 +16,10 @@ module.exports = {
         unique: true,
         allowNull: false,
       },
+      password_hash: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       plan_id: {
         type: Sequelize.STRING,
         allowNull: true,

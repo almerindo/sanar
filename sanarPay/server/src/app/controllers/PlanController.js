@@ -48,7 +48,15 @@ class PlanController {
           throw error;
         }
       });
-    return res.status(200).json('Plan Created!');
+    return res.status(400).json('Não implementado corretamente ainda!');
+  }
+
+  async index(req, res) {
+    return res.status(400).json('Not implemented Yet!');
+  }
+
+  async delete(req, res) {
+    return res.status(400).json('Not implemented Yet!');
   }
 }
 export default new PlanController();
