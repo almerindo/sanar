@@ -7,6 +7,10 @@ const routes = new Router();
 routes.post('/plan', PlanController.store);
 routes.post('/sub', SubscriberController.store2);
 
+routes.post('/customer', (req, res) => {
+  return res.json({ id: 1 });
+});
+
 /* routes.get('/', (req, res) => {
   // const url = 'https://api.mundipagg.com/core/v1/charges?code=123';
   const url = 'https://api.mundipagg.com/core/v1/plans';

@@ -1,0 +1,27 @@
+//TODO Criar cliente:
+Criar o model Cliente onde deverá persistir em banco de dados as informações
+basicas de um cliente da Sanar.
+
+//TODO Conect Client com Multipagg
+
+recebe o MAIL do cliente sanar,
+se existir cliente na base local, pegar o Nome e email e cadastrar cliente no
+MultipagG. Caso não exista retorna ERRO: Cliente não criado ainda.
+
+Lista o cliente MultipagG com o e-mail informado (caso não exista cria-se),
+pega o customer_id e atualiza o cliente Local.
+
+
+//TODO Criar Plano
+
+name,
+trial_period_days
+items,
+
+Criar o model Planos onde deverá persistir em banco de dados as informações
+básicas de um plano da Sanar.
+
+//TODO Conect Plan com MultipagG
+Recebe o NAME do Plan Sanar,
+
+

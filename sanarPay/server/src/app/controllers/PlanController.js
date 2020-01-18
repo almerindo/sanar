@@ -2,7 +2,7 @@ import mundipagg from 'mundipagg-nodejs';
 
 class PlanController {
   async store(req, res) {
-    mundipagg.Configuration.basicAuthUserName = 'sk_test_JvxAOZeiKsowrGKB';
+    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
 
     const plansController = mundipagg.PlansController;
 
