@@ -1,3 +1,6 @@
+//FIXME : Parei em skylab email duplicado.  Tem que resetar os testes todas
+as vezes que forem criados
+
 //TODO Criar cliente:
 Criar o model Cliente onde deverá persistir em banco de dados as informações
 basicas de um cliente da Sanar.
