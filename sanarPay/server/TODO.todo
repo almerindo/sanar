@@ -1,5 +1,4 @@
-//FIXME : Parei em skylab email duplicado.  Tem que resetar os testes todas
-as vezes que forem criados
+//FIXME Tem que usar o AXIOS no JEST
 
 //TODO Criar cliente:
 Criar o model Cliente onde deverá persistir em banco de dados as informações

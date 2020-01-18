@@ -1,15 +1,9 @@
 import { Router } from 'express';
-import PlanController from './app/controllers/PlanController';
-import SubscriberController from './app/controllers/SubscriberController';
+import CustomerController from './app/controllers/CustomerController';
 
 const routes = new Router();
 
-routes.post('/plan', PlanController.store);
-routes.post('/sub', SubscriberController.store);
-
-routes.post('/customer', (req, res) => {
-  return res.json({ id: 1 });
-});
+routes.post('/customer', CustomerController.store);
 
 /* routes.get('/', (req, res) => {
   // const url = 'https://api.mundipagg.com/core/v1/charges?code=123';
