@@ -18,7 +18,7 @@ class CustomerController {
         .createCustomer(request)
         .then(customer => {
           idRemote = customer.id;
-          // clientDB.customer_id = customer.id;
+          // clientDB.remote_id = customer.id;
           // clientDB.update(clientDB);
           // // console.log(`Customer Id: ${customer.id}`);
         })
@@ -44,7 +44,7 @@ class CustomerController {
       name: req.body.cliente.name,
       email: req.body.cliente.email,
       plan_id: req.body.produtos.plano_id,
-      customer_id: false,
+      remote_id: false,
     };
 
     // Se já existe cliente retorna erro
@@ -73,7 +73,7 @@ class CustomerController {
 
         throw new Error('Erro ao registrar no MundiPagG');
       }
-      clientData.customer_id = remoteID;
+      clientData.remote_id = remoteID;
       // persiste o remoteID no banco. Creio que sem o await deva ficar com mais performance
       await customer.update(clientData);
 
@@ -121,7 +121,7 @@ class CustomerController {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      customer_id: false,
+      remote_id: false,
     };
 
     // Se já existe cliente retorna erro
@@ -150,7 +150,7 @@ class CustomerController {
 
         throw new Error('Erro ao registrar no MundiPagG');
       }
-      clientData.customer_id = remoteID;
+      clientData.remote_id = remoteID;
       // persiste o remoteID no banco. Creio que sem o await deva ficar com mais performance
       await customer.update(clientData);
 

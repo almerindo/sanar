@@ -9,7 +9,7 @@ class Customer extends Model {
         email: Sequelize.STRING,
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
-        customer_id: Sequelize.STRING,
+        remote_id: Sequelize.STRING,
       },
       { sequelize }
     );
@@ -22,9 +22,13 @@ class Customer extends Model {
     return this;
   }
 
-  // static associate(models) {
-  //   this.belongsTo(models.Plan, { foreignKey: 'plan_id', as: 'plan' });
-  // }
+  static associate(models) {
+    this.hasMany(models.Card, { foreignKey: 'card_id', as: 'cards' });
+    this.hasMany(models.Subscription, {
+      foreignKey: 'subscription_id',
+      as: 'subscriptions',
+    });
+  }
 
   checkPassword(passord) {
     return bcrypt.compare(passord, this.password_hash);

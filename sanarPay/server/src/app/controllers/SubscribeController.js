@@ -59,7 +59,7 @@ class SubscribeController {
       request.payment_method = payment_method;
       request.card = card;
 
-      request.customerId = customer.customer_id;
+      request.customerId = customer.remote_id;
 
       let subsID;
       await subscriptionsController
