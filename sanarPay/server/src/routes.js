@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authMiddleware from './app/middlewares/auth';
+import checkAdminUser from './app/middlewares/checkAdmin';
 
 import SessionController from './app/controllers/SessionController';
 import CustomerController from './app/controllers/CustomerController';
@@ -10,31 +11,32 @@ import WalletController from './app/controllers/WalletController';
 const routes = new Router();
 
 // Criar um cliente ou usuário local e remotamente
-routes.post('/customers', CustomerController.store2);
+routes.post('/customers', CustomerController.store); // OK
 
 // Login
-routes.post('/sessions', SessionController.store);
+routes.post('/sessions', SessionController.store); // OK
+
+// Para criar os planos precisa ser
+// TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
+routes.post('/plans', checkAdminUser, PlanController.store); // OK
+routes.get('/plans', checkAdminUser, PlanController.index); // OK
+routes.delete('/plans/:id', checkAdminUser, PlanController.delete); // OK
 
 // Rotas que necessitem de autenticacao do cliente
 routes.use(authMiddleware);
 
-// Customers Update de informações do usuário local e remoto
-routes.put('/customers', CustomerController.update);
-routes.delete('/customers/:id', CustomerController.delete);
-
 // Cria cartao para um cliente ID
-routes.post('/customers/wallet', WalletController.store);
-routes.put('/customers/wallet', WalletController.update);
-routes.delete('/customers/wallet', WalletController.delete);
-routes.get('/customers/wallet', WalletController.index);
+routes.post('/customers/wallet', WalletController.store); // OK
+routes.delete('/customers/wallet', WalletController.delete); // OK
+routes.get('/customers/wallet', WalletController.index); // OK
 
-// TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
-routes.post('/plans', PlanController.store);
-routes.get('/plans', PlanController.index);
-routes.delete('/plans/:id', PlanController.delete);
+routes.post('/customers/subscriptions', SubscribeController.store);
+routes.get('/customers/subscriptions', SubscribeController.index);
+routes.put('/customers/subscriptions', SubscribeController.update);
+routes.delete('/customers/subscriptions', SubscribeController.delete);
 
-// Assinar um plano passado como parâmetro - Mario já era um usuário e assinou o plano X
-routes.post('/subscriptions', SubscribeController.store);
-routes.put('/subscriptions', SubscribeController.update);
+// Customers Update de informações do usuário local e remoto
+routes.put('/customers', CustomerController.update); // FIXME Testar mais
+routes.delete('/customers/:id', CustomerController.delete); // OK
 
 export default routes;

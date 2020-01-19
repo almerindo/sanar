@@ -1,54 +1,70 @@
 import mundipagg from 'mundipagg-nodejs';
+import * as Yup from 'yup';
+import Plan from '../models/Plan';
 
 class PlanController {
   async store(req, res) {
-    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      currency: Yup.string().required(),
+      interval: Yup.string().required(),
+      interval_count: Yup.number().required(),
+      billing_type: Yup.string().required(),
+      minimum_price: Yup.number(),
+      installments: Yup.array()
+        .of(
+          Yup.lazy(value =>
+            typeof value === 'number' ? Yup.number() : Yup.string()
+          )
+        )
+        .required(),
+      trial_period_days: Yup.number(),
+      payment_methods: Yup.array()
+        .of(Yup.lazy(() => Yup.string()))
+        .required(),
+      items: Yup.array().required(),
+    });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
 
+    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
     const plansController = mundipagg.PlansController;
 
     const request = new mundipagg.CreatePlanRequest();
-    request.name = 'Plano Gold';
-    request.currency = 'BRL';
-    request.interval = 'month';
-    request.intervalCount = 3;
-    request.billingType = 'prepaid';
-    request.minimum_price = 10000;
-    request.installments = [3];
-    request.paymentMethods = ['credit_card', 'boleto'];
-    request.items = [
-      new mundipagg.CreatePlanItemRequest(),
-      new mundipagg.CreatePlanItemRequest(),
-    ];
-    // Plan Item 1
-    request.items[0].name = 'Musculação';
-    request.items[0].quantity = 1;
-    request.items[0].pricingScheme = new mundipagg.CreatePricingSchemeRequest();
-    request.items[0].pricingScheme.price = 18990;
-    request.items[0].price = 18990;
-    // Plan Item 2
-    request.items[1].name = 'Matrícula';
-    // Matrícula ira cobrar apenas 1 vez. Após a primeira cobrança, nao será mais cobrado
-    request.items[1].cycles = 1;
-    request.items[1].quantity = 1;
-    request.items[1].price = 18990;
-    request.items[1].pricingScheme = new mundipagg.CreatePricingSchemeRequest();
-    request.items[1].pricingScheme.price = 5990;
+    request.name = req.body.name;
+    request.currency = req.body.currency;
+    request.interval = req.body.interval;
+    request.interval_count = req.body.interval_count;
+    request.billing_type = req.body.billing_type;
+    request.minimum_price = req.body.minimum_price;
+    request.installments = req.body.installments;
+    request.trial_period_days = req.body.trial_period_days;
+    request.payment_methods = req.body.payment_methods;
+    request.items = req.body.items;
 
-    await plansController
+    const remoteOrder = await plansController
       .createPlan(request)
       .then(order => {
-        console.log(`Plan Id: ${order.id}`);
+        return order;
       })
       .catch(error => {
-        console.log(`Status Code: ${error.errorCode}`);
         if (error.errorResponse instanceof mundipagg.ErrorException) {
-          console.log(error.errorResponse.message);
-          console.log(error.errorResponse.errors);
+          // Capturando se erro for do mundipagg, para uso futuro
+          throw new Error({
+            error: {
+              message: error.errorResponse.message,
+              erros: error.errorResponse.errors,
+            },
+          });
         } else {
           throw error;
         }
       });
-    return res.status(400).json('Não implementado corretamente ainda!');
+
+    const plan = await Plan.create({ remote_id: remoteOrder.id });
+
+    return res.status(200).json(plan);
   }
 
   async index(req, res) {
@@ -56,7 +72,32 @@ class PlanController {
   }
 
   async delete(req, res) {
-    return res.status(400).json('Not implemented Yet!');
+    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
+    const plansController = mundipagg.PlansController;
+
+    const plan_remote_id = req.params.id;
+
+    const planDeleted = await plansController
+      .deletePlan(plan_remote_id)
+      .then(plan => {
+        return plan;
+      })
+      .catch(error => {
+        res.status(404).json({
+          message: `Plan ${plan_remote_id} não encontrado no remotamente`,
+          error,
+        });
+      });
+
+    const plan = await Plan.findOne({ where: { remote_id: planDeleted.id } });
+    if (!plan) {
+      return res
+        .status(404)
+        .json(`Plan ${planDeleted.id} não encontrado no banco local`);
+    }
+    plan.canceled_at = new Date();
+    await plan.save();
+    return res.status(200).json(plan);
   }
 }
 export default new PlanController();

@@ -8,7 +8,7 @@ module.exports = {
         allowNull: false,
       },
       remote_id: {
-        type: Sequelize.STRING, // card_XXXXXXXXXXXXXXXX
+        type: Sequelize.STRING, // plan_XXXXXXXXXXXXXXXX
         unique: true,
         allowNull: false,
       },

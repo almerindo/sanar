@@ -157,5 +157,21 @@ class SubscribeController {
     // Persistir local e remotamente (Assinatura do Plano).
     return res.status(400).json('Not implemented Yet!');
   }
+
+  async index(req, res) {
+    // Capturar o customer pelo seu ID
+    // os Dados do plano desejado,se informado, para atializaçao
+    // capturar os dados do cartão de crédito para modificar (persiste só remotamente)
+    // Persistir local e remotamente (Assinatura do Plano).
+    return res.status(400).json('Not implemented Yet!');
+  }
+
+  async delete(req, res) {
+    // Capturar o customer pelo seu ID
+    // os Dados do plano desejado,se informado, para atializaçao
+    // capturar os dados do cartão de crédito para modificar (persiste só remotamente)
+    // Persistir local e remotamente (Assinatura do Plano).
+    return res.status(400).json('Not implemented Yet!');
+  }
 }
 export default new SubscribeController();
