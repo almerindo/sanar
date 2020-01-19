@@ -10,6 +10,7 @@ class Customer extends Model {
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
         remote_id: Sequelize.STRING,
+        canceled_at: Sequelize.DATE,
       },
       { sequelize }
     );
@@ -23,10 +24,10 @@ class Customer extends Model {
   }
 
   static associate(models) {
-    this.hasMany(models.Card, { foreignKey: 'card_id', as: 'cards' });
+    this.hasMany(models.Card, { as: 'cards', foreignKey: 'customer_id' }); // this.hasMany(models.Card, { foreignKey: 'card_id', as: 'cards' });
     this.hasMany(models.Subscription, {
-      foreignKey: 'subscription_id',
       as: 'subscriptions',
+      foreignKey: 'customer_id',
     });
   }
 

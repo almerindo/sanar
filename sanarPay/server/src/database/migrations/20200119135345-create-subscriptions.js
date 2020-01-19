@@ -15,15 +15,15 @@ module.exports = {
       customer_id: {
         type: Sequelize.INTEGER,
         references: { model: 'customers', key: 'id' },
-        onUpdate: 'CASCATE',
-        onDelete: 'CASCATE',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
         allowNull: false,
       },
       plan_id: {
         type: Sequelize.INTEGER,
         references: { model: 'plans', key: 'id' },
-        onUpdate: 'CASCATE',
-        onDelete: 'CASCATE',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
         allowNull: false,
       },
       created_at: {
