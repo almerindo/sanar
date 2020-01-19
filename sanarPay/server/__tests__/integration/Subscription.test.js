@@ -35,10 +35,20 @@ describe('Assinante', () => {
     expect(response.status).toBe(200);
   });
 
-  it('Deve ser possivel fazer uma assinatura trimestral', async () => {
+  it('Deve ser possivel assinar um plano trimestral', async () => {
     // Marcos teve um problema com o cartão de crédito e gostaria de alterar o cartão para a próxima cobrança
     // https://api.mundipagg.com/core/v1/plans criar o plano trimestral ou fazer uma assinatura avulsas
 
+    const data = {};
+    const subscriber_id = 'sub_XXXXXXXXXXXXXXXX';
+    const response = await request(app)
+      .patch(`/customer/${subscriber_id}`)
+      .send(data);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('Deve ser possivel assinar o plano promocional', async () => {
     const data = {};
     const subscriber_id = 'sub_XXXXXXXXXXXXXXXX';
     const response = await request(app)
@@ -52,16 +62,6 @@ describe('Assinante', () => {
     // Marcos teve um problema com o cartão de crédito e gostaria de alterar o cartão para a próxima cobrança
     // https://api.mundipagg.com/core/v1/subscriptions/subscription_id/card
 
-    const data = {};
-    const subscriber_id = 'sub_XXXXXXXXXXXXXXXX';
-    const response = await request(app)
-      .patch(`/customer/${subscriber_id}`)
-      .send(data);
-
-    expect(response.status).toBe(200);
-  });
-
-  it('Deve ser possivel fazer uma assinatura promocional e após um mes a cobrança voltar ao normal', async () => {
     const data = {};
     const subscriber_id = 'sub_XXXXXXXXXXXXXXXX';
     const response = await request(app)

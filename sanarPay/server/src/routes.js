@@ -5,6 +5,7 @@ import SessionController from './app/controllers/SessionController';
 import CustomerController from './app/controllers/CustomerController';
 import PlanController from './app/controllers/PlanController';
 import SubscribeController from './app/controllers/SubscribeController';
+import WalletController from './app/controllers/WalletController';
 
 const routes = new Router();
 
@@ -20,6 +21,12 @@ routes.use(authMiddleware);
 // Customers Update de informações do usuário local e remoto
 routes.put('/customers', CustomerController.update);
 routes.delete('/customers/:id', CustomerController.delete);
+
+// Cria cartao para um cliente ID
+routes.post('/customers/wallet', WalletController.store);
+routes.put('/customers/wallet', WalletController.update);
+routes.delete('/customers/wallet', WalletController.delete);
+routes.get('/customers/wallet', WalletController.index);
 
 // TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
 routes.post('/plans', PlanController.store);

@@ -34,6 +34,28 @@ describe('Client', () => {
     // expect(response.body).toHaveProperty('id');
   });
 
+  it('Deve ser possível um cliente se logar', async () => {
+    // PASSAR O email e senha e retornar o token JWT
+    const data = {};
+    const response = await request(app)
+      .post('/session')
+      .send(data);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('Deve ser possível um cliente assinar um determinado Plano', async () => {
+    // PASSAR O TOKEN de LOGIN, ID do PLANO para assinar e dados do cartao
+    const data = {};
+    const response = await request(app)
+      .post('/plan')
+      .send(data);
+
+    expect(response.status).toBe(200);
+
+    // expect(response.body).toHaveProperty('id');
+  });
+
   it('Não pode registrar um client com e-mail duplicado', async () => {
     await request(app)
       .post('/sub')
@@ -74,27 +96,5 @@ describe('Client', () => {
       });
 
     expect(response.status).toBe(400);
-  });
-
-  it('Deve ser possível um cliente se logar', async () => {
-    // PASSAR O email e senha e retornar o token JWT
-    const data = {};
-    const response = await request(app)
-      .post('/session')
-      .send(data);
-
-    expect(response.status).toBe(200);
-  });
-
-  it('Deve ser possível um cliente assinar um determinado Plano', async () => {
-    // PASSAR O TOKEN de LOGIN, ID do PLANO para assinar e dados do cartao
-    const data = {};
-    const response = await request(app)
-      .post('/plan')
-      .send(data);
-
-    expect(response.status).toBe(200);
-
-    // expect(response.body).toHaveProperty('id');
   });
 });
