@@ -15,19 +15,19 @@ routes.post('/customers', CustomerController.store2);
 routes.post('/sessions', SessionController.store);
 
 // Rotas que necessitem de autenticacao do cliente
-// routes.use(authMiddleware);
+routes.use(authMiddleware);
 
 // Customers Update de informações do usuário local e remoto
 routes.put('/customers', CustomerController.update);
 routes.delete('/customers/:id', CustomerController.delete);
 
-// plano
+// TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
 routes.post('/plans', PlanController.store);
 routes.get('/plans', PlanController.index);
 routes.delete('/plans/:id', PlanController.delete);
 
-// Assinar um plano // Mario já era um usuário e assinou o plano X
-routes.post('/subscribes', SubscribeController.store);
-routes.put('/subscribes', SubscribeController.update);
+// Assinar um plano passado como parâmetro - Mario já era um usuário e assinou o plano X
+routes.post('/subscriptions', SubscribeController.store);
+routes.put('/subscriptions', SubscribeController.update);
 
 export default routes;
