@@ -94,6 +94,11 @@ class SubscribeController {
 
     const remote_id = plan_id;
     const plan = await Plan.findOne({ where: { remote_id } });
+    if (!plan) {
+      return res
+        .status(404)
+        .json(`O plano ${plan_id} não está cadastrado no sistema local!`);
+    }
 
     // Verificar se o usuário já assinou esse plano
     const subsExists = await Subscription.findOne({
@@ -162,11 +167,36 @@ class SubscribeController {
   }
 
   async index(req, res) {
-    // Capturar o customer pelo seu ID
-    // os Dados do plano desejado,se informado, para atializaçao
-    // capturar os dados do cartão de crédito para modificar (persiste só remotamente)
-    // Persistir local e remotamente (Assinatura do Plano).
-    return res.status(400).json('Not implemented Yet!');
+    const customer = await Customer.findByPk(req.userID);
+    const { subscriptionId } = req.body;
+
+    // Se o parametro subscriptionId não existir, retorna todos os IDs das assinaturas do usuário logado
+    if (!subscriptionId) {
+      // Verifica se o usuario possui esta assinatura
+      const result = await Subscription.findOne({
+        where: {
+          customer_id: customer.id,
+        },
+      });
+      return res.status(200).json(result);
+    }
+
+    const subscriptionsController = mundipagg.SubscriptionsController;
+
+    const subData = await subscriptionsController
+      .getSubscription(subscriptionId)
+      .then(subscription => {
+        return subscription;
+      })
+      .catch(error => {
+        return null;
+      });
+
+    if (!subData) {
+      return res.status(400).json('Assinatura não existe no servidor');
+    }
+
+    return res.status(200).json(subData);
   }
 
   async delete(req, res) {
@@ -183,6 +213,7 @@ class SubscribeController {
     request.cancel_pending_invoices = true;
 
     // Cancela remotamente
+
     const result = await subscriptionsController
       .cancelSubscription(subscriptionId, request)
       .then(subscription => {
@@ -191,19 +222,22 @@ class SubscribeController {
       .catch(error => {
         if (error.errorResponse instanceof mundipagg.ErrorException) {
           // Capturando se erro for do mundipagg, para uso futuro
-          throw new Error({
-            error: {
-              message: error.errorResponse.message,
-              erros: error.errorResponse.errors,
-            },
-          });
-        } else {
-          throw error;
+          return null;
+          // throw new Error({
+          //   error: {
+          //     message: error.errorResponse.message,
+          //     erros: error.errorResponse.errors,
+          //   },
+          // });
         }
+        throw error;
       });
 
-    // VERIFICA SE EXISTE ASSINATURA NÃO CANCELADA E CANCELA
-    // FIXME
+    if (!result) {
+      return res.status(400).json('Não existe assinatura no banco remoto!');
+    }
+
+    // Cancela localmente
     const remote_id = result.id;
     const sub = await Subscription.findOne({
       where: {
@@ -214,11 +248,13 @@ class SubscribeController {
       },
     });
     if (!sub) {
-      res.status(400).json('Não existe assinatura!');
+      return res
+        .status(400)
+        .json(`Não existe assinatura registrada com id = ${result.id}!`);
     }
     // Verifica se já foi cancelado
     if (sub.canceled_at) {
-      res.status(400).json('Assinatura já havia sido cancelada!');
+      return res.status(400).json('Assinatura já havia sido cancelada!');
     }
     sub.canceled_at = new Date();
     const subUpdated = await sub.save();
