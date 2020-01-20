@@ -220,7 +220,7 @@ Ao clicar em ```Send```, deverá retornar algo como:
       "cycles": 1,
       "quantity": 1,
       "pricing_scheme": {
-        "price": 16440
+        "price": 13990
       }
     }
    ]
