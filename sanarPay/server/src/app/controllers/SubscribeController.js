@@ -1,6 +1,9 @@
 import mundipagg from 'mundipagg-nodejs';
 import * as Yup from 'yup';
 import Customer from '../models/Customer';
+import Card from '../models/Card';
+import Subscription from '../models/Subscription';
+import Plan from '../models/Plan';
 
 import mundipaggConfig from '../../config/mundipagg';
 
@@ -25,7 +28,7 @@ import mundipaggConfig from '../../config/mundipagg';
  */
 
 class SubscribeController {
-  async store(req, res) {
+  async store2(req, res) {
     const schema = Yup.object().shape({
       plan_id: Yup.string().required('Informe o ID do plano!'),
       payment_method: Yup.string().required('Informe o método de pagamento!'),
@@ -53,7 +56,7 @@ class SubscribeController {
 
     async function subsOnPlan() {
       const subscriptionsController = mundipagg.SubscriptionsController;
-      mundipagg.Configuration.basicAuthUserName = mundipaggConfig.pk;
+      mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
       const request = new mundipagg.CreateSubscriptionRequest();
       request.planId = plan_id;
       request.payment_method = payment_method;
@@ -148,6 +151,114 @@ class SubscribeController {
 
     const subsID = await subsOnPlan();
     return res.status(200).json({ customer, subsID });
+  }
+
+  // Capturar o Customer pelo ID
+  // Capturar o Plano_ID que deseja ser assinado
+  // Capturar o Cartao pelo ID do cartao de credito do usuário
+  // Persistir Local e remotamente
+  async store(req, res) {
+    const schema = Yup.object().shape({
+      plan_id: Yup.string().required('Informe o ID do plano!'),
+      payment_method: Yup.string().required('Informe o método de pagamento!'),
+      card_id: Yup.string().required('Informe o ID do Cartao!'),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: `Validation fails` });
+    }
+
+    // Capturar o customer pelo seu ID
+    // os Dados do plano desejado
+    // assinar o Plano
+    // Persistir local e remotamente.
+    const { plan_id, payment_method, card_id } = req.body;
+    const customer = await Customer.findOne({
+      where: { id: req.userID },
+      // attributes: ['name', 'email', 'remote_id'],
+      include: [
+        {
+          model: Card,
+          as: 'cards',
+          // attributes: ['remote_id'],
+        },
+        {
+          model: Subscription,
+          as: 'subscriptions',
+          // attributes: ['remote_id'],
+        },
+      ],
+    });
+
+    // Verificar se o ID do cartão passado está associado ao cliente
+    if (!customer) {
+      return res.status(404).json('Customer não encontrado!');
+    }
+
+    if (!customer.cards.length) {
+      return res
+        .status(404)
+        .json('Customer não possui cartoes cadastrados em sua carteira!');
+    }
+
+    const cardLocal = customer.cards.find(card => {
+      return card.remote_id === card_id;
+    });
+
+    if (!cardLocal) {
+      return res
+        .status(404)
+        .json(`O cartao ${card_id} não está associado ao Cliente ${customer} `);
+    }
+
+    // FIXME Verificar se o usuário já assinou esse plano
+    const remote_id = plan_id;
+
+    const plan = await Plan.findOne({ where: { remote_id } });
+
+    const subsExists = await Subscription.findOne({
+      where: { customer_id: customer.id, plan_id: plan.id },
+    });
+    if (subsExists) {
+      return res
+        .status(400)
+        .json(
+          `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${plan_id}`
+        );
+    }
+
+    // Aqui encontrei o cliente e o cartao.
+    // Pesquisei o cliente localmente pra evitar acesso a rede
+    // Obs não seria interessante armazenar os dados do cartao em banco, muito risco!
+    const subscriptionsController = mundipagg.SubscriptionsController;
+    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
+    const request = new mundipagg.CreateSubscriptionRequest();
+    request.planId = plan_id;
+    request.payment_method = payment_method;
+    request.customerId = customer.remote_id;
+    request.card = cardLocal;
+    const subscrition = await subscriptionsController
+      .createSubscription(request)
+      .then(subscription => {
+        return subscription;
+      })
+      .catch(error => {
+        console.log(`Status Code: ${error.errorCode}`);
+        if (error.errorResponse instanceof mundipagg.ErrorException) {
+          console.log(error.errorResponse.message);
+          console.log(error.errorResponse.errors);
+        } else {
+          throw error;
+        }
+      });
+
+    await Subscription.create({
+      remote_id: subscrition.ids,
+      customer_id: customer.id,
+      plan_id: plan.id,
+    });
+
+    return res.status(200).json(subscrition);
   }
 
   async update(req, res) {

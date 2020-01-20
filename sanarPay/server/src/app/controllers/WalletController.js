@@ -76,7 +76,15 @@ class WalletController {
         .json('Não foi possivel guardar o cartão no servidor remoto');
     }
 
-    const data = { remote_id: remoteCard.id, customer_id: req.userID };
+    const data = {
+      remote_id: remoteCard.id,
+      customer_id: req.userID,
+      holder_name: req.body.card.holder_name,
+      number: req.body.card.number,
+      exp_month: req.body.card.exp_month,
+      exp_year: req.body.card.exp_year,
+      cvv: req.body.card.cvv,
+    };
 
     // Verifica se já tem um cartão com esse número cadastrado para esse client
     const cardExist = await Card.findOne({

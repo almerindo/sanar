@@ -119,8 +119,12 @@ class CustomerController {
       return res.status(401).json('A senha de confirmação não confere!');
     }
 
-    customerExists.canceled_at = new Date();
-    await customerExists.save();
+    // APAGAR LOGICAMENTE
+    // customerExists.canceled_at = new Date();
+    // await customerExists.save();
+
+    // APAGAR FISICAMENTE
+    await customerExists.destroy();
 
     return res.status(200).json(customerExists);
   }

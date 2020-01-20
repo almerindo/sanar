@@ -7,8 +7,33 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      holder_name: {
+        type: Sequelize.STRING,
+        unique: false,
+        allowNull: false,
+      },
+      number: {
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      exp_month: {
+        type: Sequelize.INTEGER,
+        unique: false,
+        allowNull: false,
+      },
+      exp_year: {
+        type: Sequelize.INTEGER,
+        unique: false,
+        allowNull: false,
+      },
+      cvv: {
+        type: Sequelize.STRING,
+        unique: false,
+        allowNull: true,
+      },
       remote_id: {
-        type: Sequelize.STRING, // plan_XXXXXXXXXXXXXXXX
+        type: Sequelize.STRING, // card_XXXXXXXXXXXXXXXX
         unique: true,
         allowNull: false,
       },

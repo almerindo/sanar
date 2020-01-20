@@ -19,24 +19,22 @@ routes.post('/sessions', SessionController.store); // OK
 // Para criar os planos precisa ser
 // TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
 routes.post('/plans', checkAdminUser, PlanController.store); // OK
-routes.get('/plans', checkAdminUser, PlanController.index); // OK
 routes.delete('/plans/:id', checkAdminUser, PlanController.delete); // OK
 
 // Rotas que necessitem de autenticacao do cliente
-routes.use(authMiddleware);
+routes.use(authMiddleware); // OK
 
 // Cria cartao para um cliente ID
 routes.post('/customers/wallet', WalletController.store); // OK
 routes.delete('/customers/wallet', WalletController.delete); // OK
 routes.get('/customers/wallet', WalletController.index); // OK
 
-routes.post('/customers/subscriptions', SubscribeController.store);
-routes.get('/customers/subscriptions', SubscribeController.index);
-routes.put('/customers/subscriptions', SubscribeController.update);
-routes.delete('/customers/subscriptions', SubscribeController.delete);
+routes.post('/customers/subscriptions', SubscribeController.store); // OK
+routes.get('/customers/subscriptions', SubscribeController.index); // FIXME Não implementado ainda
+routes.put('/customers/subscriptions', SubscribeController.update); // FIXME Alterar a forma de pagamento
+routes.delete('/customers/subscriptions', SubscribeController.delete); // FIXME Cancelar uma Inscrição
 
 // Customers Update de informações do usuário local e remoto
-routes.put('/customers', CustomerController.update); // FIXME Testar mais
-routes.delete('/customers/:id', CustomerController.delete); // OK
+routes.delete('/customers/:id', CustomerController.delete);
 
 export default routes;

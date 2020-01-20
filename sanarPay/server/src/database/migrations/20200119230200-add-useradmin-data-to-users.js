@@ -8,7 +8,7 @@ module.exports = {
         {
           id: 0,
           name: 'Administrador',
-          email: 'admin@gympoint.com',
+          email: 'admin@sanarflix.com.br',
           password_hash: bcrypt.hashSync('1234567890', 8),
           created_at: new Date(),
           updated_at: new Date(),
@@ -18,13 +18,20 @@ module.exports = {
     );
   },
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
+  down: queryInterface => {
+    return queryInterface.bulkDelete(
+      'customers',
+      [
+        {
+          id: 0,
+          name: 'Administrador',
+          email: 'admin@sanarflix.com.br',
+          password_hash: bcrypt.hashSync('1234567890', 8),
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      ],
+      {}
+    );
   },
 };
