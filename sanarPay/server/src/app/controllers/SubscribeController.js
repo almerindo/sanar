@@ -159,11 +159,33 @@ class SubscribeController {
   }
 
   async update(req, res) {
-    // Capturar o customer pelo seu ID
-    // os Dados do plano desejado,se informado, para atializaçao
-    // capturar os dados do cartão de crédito para modificar (persiste só remotamente)
-    // Persistir local e remotamente (Assinatura do Plano).
-    return res.status(400).json('Not implemented Yet!');
+    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
+
+    const subscriptionsController = mundipagg.SubscriptionsController;
+
+    const { subscription_id, card_id } = req.body;
+
+    const request = new mundipagg.UpdateSubscriptionCardRequest();
+    request.cardId = card_id;
+
+    const result = await subscriptionsController
+      .updateSubscriptionCard(subscription_id, request)
+      .then(subscription => {
+        return {
+          subscription_id: subscription.id,
+          new_card_id: subscription.card.id,
+          cardFirstSixDigits: subscription.card.firstSixDigits,
+          cardLastFourDigits: subscription.card.lastFourDigits,
+        };
+      })
+      .catch(error => {
+        return null;
+      });
+
+    if (!result) {
+      return res.status(400).json('Não foi possivel atualizar o cartao');
+    }
+    return res.status(200).json(result);
   }
 
   async index(req, res) {
@@ -173,11 +195,16 @@ class SubscribeController {
     // Se o parametro subscriptionId não existir, retorna todos os IDs das assinaturas do usuário logado
     if (!subscriptionId) {
       // Verifica se o usuario possui esta assinatura
-      const result = await Subscription.findOne({
+      const result = await Subscription.findAll({
         where: {
           customer_id: customer.id,
+          canceled_at: null,
         },
       });
+      if (result.length === 0) {
+        return res.status(404).json('Nenhuma assinatura ativa!');
+      }
+
       return res.status(200).json(result);
     }
 

@@ -30,11 +30,11 @@ routes.delete('/customers/wallet', WalletController.delete); // OK
 routes.get('/customers/wallet', WalletController.index); // OK
 
 routes.post('/customers/subscriptions', SubscribeController.store); // OK
-routes.get('/customers/subscriptions', SubscribeController.index); // FIXME Não implementado ainda
-routes.put('/customers/subscriptions', SubscribeController.update); // FIXME Alterar a forma de pagamento
-routes.delete('/customers/subscriptions', SubscribeController.delete); // FIXME Cancelar uma Inscrição
+routes.get('/customers/subscriptions', SubscribeController.index); // OK
+routes.put('/customers/subscriptions', SubscribeController.update); // OK
+routes.delete('/customers/subscriptions', SubscribeController.delete); // OK
 
 // Customers Update de informações do usuário local e remoto
-routes.delete('/customers/:id', CustomerController.delete);
+routes.delete('/customers/:id', CustomerController.delete); // OK
 
 export default routes;
