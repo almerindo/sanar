@@ -225,7 +225,7 @@ describe('CUSTOMERS', () => {
       });
   });
 
-  let plan_remote_id;
+  let plan_standard_remote_id;
   it('Deve se locar como usuário Admin e criar o plano Standard por R$ 24,50', async () => {
     data = {};
     data.email = 'admin@sanarflix.com.br';
@@ -264,7 +264,52 @@ describe('CUSTOMERS', () => {
       .set('Authorization', `Bearer ${data.token}`)
       .send(data)
       .then(response => {
-        plan_remote_id = response.body.remote_id;
+        plan_standard_remote_id = response.body.remote_id;
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('remote_id');
+      });
+  });
+
+  let plan_trial_remote_id;
+  it('Deve se locar como usuário Admin e criar o plano trial', async () => {
+    data = {};
+    data.email = 'admin@sanarflix.com.br';
+    data.password = '1234567890';
+    await request(app)
+      .post('/sessions')
+      .send(data)
+      .then(response => {
+        data.token = response.body.token;
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('token');
+      });
+    // enviando os dados do plano e o token
+    data = {
+      token: data.token,
+      name: 'Plano Trimestral',
+      currency: 'BRL',
+      interval: 'month',
+      interval_count: 3,
+      billing_type: 'prepaid',
+      minimum_price: 6990,
+      installments: [1],
+      payment_methods: ['credit_card', 'boleto'],
+      items: [
+        {
+          name: 'Sanar Flix',
+          quantity: 1,
+          pricing_scheme: {
+            price: 6990,
+          },
+        },
+      ],
+    };
+    await request(app)
+      .post('/plans')
+      .set('Authorization', `Bearer ${data.token}`)
+      .send(data)
+      .then(response => {
+        plan_trial_remote_id = response.body.remote_id;
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('remote_id');
       });
@@ -341,22 +386,47 @@ describe('CUSTOMERS', () => {
       });
   });
 
-  it(`Mario deve assinar o plano ${plan_remote_id}`, async () => {
+  it(`Mario deve assinar o plano ${plan_standard_remote_id}`, async () => {
     // Utiliza esse mesmo token para criar um cartao em sua wallet
-
+    const subsc_data = {
+      plan_id: plan_standard_remote_id,
+      payment_method: 'credit_card',
+      card_id: data.card.remote_id,
+    };
     await request(app)
       .post(`/customers/subscriptions`)
       .set('Authorization', `Bearer ${data.token}`)
-      .send({
-        plan_id: plan_remote_id,
-        payment_method: 'credit_card',
-        card_id: data.card.remote_id,
-      })
+      .send(subsc_data)
       .then(response => {
         data.subscription = {
           remote_id: response.body.id,
           status: response.body.status,
         };
+        console.log(data);
+        console.log(response.text);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('start_at');
+      });
+  });
+
+  it(`Mario deve assinar o plano ${plan_trial_remote_id}`, async () => {
+    // Utiliza esse mesmo token para criar um cartao em sua wallet
+    const subsc_data = {
+      plan_id: plan_trial_remote_id,
+      payment_method: 'credit_card',
+      card_id: data.card.remote_id,
+    };
+    await request(app)
+      .post(`/customers/subscriptions`)
+      .set('Authorization', `Bearer ${data.token}`)
+      .send(subsc_data)
+      .then(response => {
+        data.subscription = {
+          remote_id: response.body.id,
+          status: response.body.status,
+        };
+
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('start_at');
       });
