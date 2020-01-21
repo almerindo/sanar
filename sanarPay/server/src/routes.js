@@ -37,4 +37,7 @@ routes.delete('/customers/subscriptions', SubscribeController.delete); // OK
 // Customers Update de informações do usuário local e remoto
 routes.delete('/customers/:id', CustomerController.delete); // OK
 
+routes.get('/', (req, res) => {
+  return res.status(200).json({ token: req.body.token });
+});
 export default routes;

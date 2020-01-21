@@ -263,9 +263,9 @@ class SubscribeController {
     if (!result) {
       return res.status(400).json('Não existe assinatura no banco remoto!');
     }
-
     // Cancela localmente
     const remote_id = result.id;
+
     const sub = await Subscription.findOne({
       where: {
         remote_id,
