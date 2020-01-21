@@ -83,35 +83,39 @@ Ao clicar em ```Send```, deverá retornar algo como:
 # 
 # Todas as outras requisições devem conter o token de autenticação
 ```js
-{
-    "number": "4011185771285580",
-    "holder_name": "Tony Stark",
-    "holder_document": "93095135270",
-    "exp_month": 1,
-    "exp_year": 20,
-    "cvv": "651",
-    "brand": "Mastercard",
-    "private_label": false,
-    "options": {
-        "verify_card": true
-    }
-}
+ {
+	 "card": {
+        "number": "4011185771285580",
+        "holder_name": "Tony Stark",
+        "holder_document": "93095135270",
+        "exp_month": 1,
+        "exp_year": 20,
+        "cvv": "651",
+        "brand": "Mastercard",
+        "private_label": false,
+        "options": {
+            "verify_card": true
+        }
+ 	 }
+ }
 ```
 
 ```js
 
 {
-    "number": "4000000000000010",
-    "holder_name": "Tony Stark",
-    "holder_document": "93095135270",
-    "exp_month": 1,
-    "exp_year": 20,
-    "cvv": "351",
-    "brand": "Mastercard",
-    "private_label": false,
-    "options": {
-        "verify_card": true
-    }
+  "card":{
+      "number": "4000000000000010",
+      "holder_name": "Tony Stark",
+      "holder_document": "93095135270",
+      "exp_month": 1,
+      "exp_year": 20,
+      "cvv": "351",
+      "brand": "Mastercard",
+      "private_label": false,
+      "options": {
+          "verify_card": true
+      }
+  }
 }
 ```
 
@@ -154,7 +158,7 @@ Ao clicar em ```Send```, deverá retornar algo como:
   "interval": "month",
   "interval_count": 1,
   "billing_type": "prepaid",
-  "minimum_price": 6990,
+  "minimum_price": 2450,
   "installments": [1],
   "trial_period_days": 7,
   "payment_methods":["credit_card","boleto"],
@@ -163,7 +167,7 @@ Ao clicar em ```Send```, deverá retornar algo como:
       "name": "Sanar Flix",
       "quantity": 1,
       "pricing_scheme": {
-        "price": 6990
+        "price": 2450
       }
     }
    ]
