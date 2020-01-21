@@ -431,4 +431,20 @@ describe('CUSTOMERS', () => {
         expect(response.body).toHaveProperty('start_at');
       });
   });
+
+  it(`Mario deve cancelar a assinatura de um plano ${plan_trial_remote_id}`, async () => {
+    // Utiliza esse mesmo token para criar um cartao em sua wallet
+    const subsc_data = {
+      subscriptionId: data.subscription.remote_id,
+    };
+    await request(app)
+      .delete(`/customers/subscriptions`)
+      .set('Authorization', `Bearer ${data.token}`)
+      .send(subsc_data)
+      .then(response => {
+        console.log('AAAAAAAAAAAA');
+        console.log(data.subscription.remote_id);
+        expect(response.statusCode).toBe(200);
+      });
+  });
 });
