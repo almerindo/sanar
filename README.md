@@ -1,3 +1,88 @@
+# Introdução
+Essa API foi desenvolvida puramente com o intúito de resolver um desafio passado pela SanarFlix.
+
+## Sobre o Desafio:
+A Sanar está repaginando um de seus principais produtos, o Sanarflix. Uma plataforma de cursos online voltados aos estudantes e profissionais de medicina, que entrega mais de 1.000 conteúdos em diversos formatos e por apena R$ 24,50/mês. ​
+
+Atualmente o Sanarflix usa como solução de pagamentos a MundiPagg, porém em uma versão antiga da API, disponível em https://docs-legacy.mundipagg.com/ ​
+
+A MundiPagg apresentou uma nova API com diversas funcionalidades interessantes para serem aplicadas no Sanarflix, como a gestão de Planos, Assinaturas e o controle e manipulação das assinaturas vigentes de uma forma simplificada. ​
+
+Disponível em https://docs.mundipagg.com/v1/reference ​
+
+Com base nas informações apresentadas acima, desenvolva um serviço web RESTful para a integração entre o produto Sanarflix e a MundiPagg. ​
+
+A API deve ser desenvolvida em alguma das seguintes linguagens: Javascript/Node.js, Python, Ruby, PHP, Clojure ou Go, e deve lidar com os seguintes casos: ​
+
+1. Mario é um novo cliente que acabou de assinar o Sanarflix ​
+
+2. Juliana assinou para testar o Sanarflix por 7 dias grátis, antes da primeira cobrança ​
+
+3. Pedro assinou o Sanarflix Trimestral, por R$69,90 ​
+
+4. Marcos teve um problema com o cartão de crédito e gostaria de alterar o cartão para a próxima cobrança ​
+
+5. Luiz fez a assinatura na promoção do Sanarflix + Livro Yellowbook, por um valor de R$164,40 no primeiro mês e depois a assinatura normal de R$24,50 ​
+
+6. Ricardo quer cancelar a assinatura do Sanarflix 
+
+## Solução implementada nesta API
+Após estudar a API da MundiPagG, chegamos à conclusão que para resolver o desafio, basta criar planos de assinaturas diferentes para cada caso.​
+
+Ou seja, inicialmente um administrador ( usuário master da SanarFlix) criará 4 planos. __Somente o administrador__ poderá criar planos e precificá-lo.​ São eles:
+
+ * Plano Standard – R$ 24, 50​
+
+* Plano Standard 7Days Trial​
+
+* Plano Trimestral​
+
+* Promocional Sanarflix + Livro Yellowbook​
+
+A API permite que um usuário crie sua conta, apenas informando seu e-mail e senha.​
+
+A API permite que o usuário logado ( com token JWT) adicione um ou mais cartões em sua carteira virtual (Wallet)​
+
+
+### Com usuário criado e com cartão cadastrado​
+
+### Planos​
+
+* ####  O usuário poderá assinar qualquer um dos planos existentes.​
+
+* #### O usuário poderá cancelar sua assinatura de algum plano.​
+
+* #### O usuário poderá alterar seu cartão de crédito, associado a uma assinatura de plano, para ser cobrado na próxima fatura.​
+
+### Wallet​
+
+* #### O usuário poderá adicionar cartões.​
+
+* #### O usuário poderá listar seus cartões.​
+
+* #### O usuário poderá apagar um cartão de sua assinatura.​
+
+
+# Vídeos demonstrativos de como instalar, configurar e usar todo o ambiente e a API implementada: 
+## Playlist no youtube só sobre o desafio SanarFlix, pode ser acessada em: https://www.youtube.com/playlist?list=PLWgTXjuvJE-bnv5mMhWWu3b5lWALBBTcn ou individualmente em cada um dos links a seguir conforme seu tema:
+- [X] V1 - Introdução ao desafio da SANAR -> https://youtu.be/14SkrVDg-hc
+- [X] V2 - Introdução ao Docker para rodar Postgresql -> https://youtu.be/g1_16AFXQfs
+- [X] V3 - Introdução ás estruturas do vscode e os testes de integração -> https://youtu.be/b9rphiBXVuY
+- [X] V4 - Introdução à estrutura da API, arquivos e pastas -> https://youtu.be/YvbiX4nG2lA
+- [X] V5 - Explicando as rotas da API desenvolvida -> https://youtu.be/zo5C8RtIjfA
+- [X] V6 - Introdução às chaves de acesso da MultipagG -> https://youtu.be/YZZ-EjpbwXI
+- [X] V7 - Pegando a chave de teste da MultipagG -> https://youtu.be/FDjo3_-iNjs
+- [X] V8 - Criando um Cliente e se logando com ele -> https://youtu.be/1XFwVXdJO0Y
+- [X] V9 - Criando Planos de assinaturas com itens e preços -> https://youtu.be/u46uNc4mG5s
+- [X] V10 - Criando os exemplos de uso passado no __Desafio__ -> https://youtu.be/jU7m2XPJ1iU
+- [X] V11 - Mostra como agilizar os testes, cadastrando no Insomnia, os tokens em variáveis de ambiente -> https://youtu.be/z7wbh2MmT10
+- [X] V12 - Mostra resolvendo o __Caso 1__: Mario assina o plano Standard -> https://youtu.be/NUODsKoPw6g
+- [X] V13 - Mostra resolvendo o __Caso 2__: Juliana assina o plano Trial 7D -> https://youtu.be/cnBnnfbsw6o
+- [X] V14 - Mostra resolvendo o __Caso 3__ e __Caso 5__: Pedro Assina o plano trimestral e Luiz assina o plano promocional -> https://youtu.be/I8aTL7p8Bmw
+- [X] V15 - Mostra resolvendo o __Caso 6__: Ricardo cancela a assinatura -> https://youtu.be/VCPEdtT0CEQ
+- [X] V16 - Mostra resolvendo o __Caso 4__: Marcos alterando a forma de pagamento de um plano -> https://youtu.be/24k5BvHm7Rg
+- [X] V17 - Considerações sobre o desafio e agradecimentos -> https://youtu.be/G4S8gRoNFes
+
 # Rodando a aplicação
 
 ## Clonando a API:
@@ -175,7 +260,7 @@ Ao clicar em ```Send```, deverá retornar algo como:
 ```
 ### Todas as demais rotas da API exigem um token de autenticção válido.
 
-# Exemplos de JSON para a API:
+# Exemplos de rotas e requisições com dados JSON para serem eviados para a API:
 
 ## POST /customers/wallet  - Rota para criar cartão de crédito na Wallet do usuário 
 
