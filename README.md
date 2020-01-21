@@ -102,7 +102,7 @@ yarn test:watch
 
 
 
-# Usando a API com o Insomnias
+# Usando a API com o Insomnia
 
 1) Instale o ```Insomnia``` para fazer as requisições, import o arquivo de configuração ```JSON``` a no seu Insomnia
 
