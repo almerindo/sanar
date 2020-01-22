@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 
 import Customer from '../models/Customer';
 
@@ -64,12 +65,20 @@ class CustomerController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const customerExists = await Customer.findByPk(req.userID);
+    // Verifica na base local se existe ou se já foi cancelado.
+    const customerExists = await Customer.findOne({
+      where: {
+        id: req.userID,
+        canceled_at: {
+          [Op.eq]: null,
+        },
+      },
+    });
+
     if (!customerExists) {
-      return res.status(404).json('Algo errado! Usuário não encontrado!');
-    }
-    if (customerExists.canceled_at) {
-      return res.status(400).json('Usuário está cancelado!');
+      return res.status(404).json({
+        error: 'Algo errado! Usuário não encontrado! ou já cancelado',
+      });
     }
 
     const data = req.body;
