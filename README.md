@@ -67,7 +67,7 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 ## Playlist no youtube só sobre o desafio SanarFlix, pode ser acessada em: https://www.youtube.com/playlist?list=PLWgTXjuvJE-bnv5mMhWWu3b5lWALBBTcn ou individualmente em cada um dos links a seguir conforme seu tema:
 - [X] V1 - Introdução ao desafio da SANAR -> https://youtu.be/14SkrVDg-hc
 - [X] V2 - Introdução ao Docker para rodar Postgresql -> https://youtu.be/g1_16AFXQfs
-- [X] V3 - Introdução ás estruturas do vscode e os testes de integração -> https://youtu.be/b9rphiBXVuY
+- [X] V3 - Introdução às estruturas do VSCode e os testes de integração -> https://youtu.be/b9rphiBXVuY
 - [X] V4 - Introdução à estrutura da API, arquivos e pastas -> https://youtu.be/YvbiX4nG2lA
 - [X] V5 - Explicando as rotas da API desenvolvida -> https://youtu.be/zo5C8RtIjfA
 - [X] V6 - Introdução às chaves de acesso da MultipagG -> https://youtu.be/YZZ-EjpbwXI
