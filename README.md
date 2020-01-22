@@ -29,7 +29,7 @@ A API deve ser desenvolvida em alguma das seguintes linguagens: Javascript/Node.
 ## Solução implementada nesta API
 Após estudar a API da MundiPagG, chegamos à conclusão que para resolver o desafio, basta criar planos de assinaturas diferentes para cada caso.​
 
-Ou seja, inicialmente um administrador ( usuário master da SanarFlix) criará 4 planos. __Somente o administrador__ poderá criar planos e precificá-lo.​ São eles:
+Ou seja, inicialmente um administrador ( usuário master da Sanarflix) criará 4 planos. __Somente o administrador__ poderá criar planos e precificá-lo.​ São eles:
 
  * Plano Standard – R$ 24, 50​
 
