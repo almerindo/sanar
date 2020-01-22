@@ -12,14 +12,13 @@ class CustomerController {
       password: Yup.string().required(),
     });
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+      return res.status(400).json({ error: 'Validation fails', status: 400 });
     }
 
     const clientData = {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      remote_id: false,
     };
 
     // Se já existe cliente retorna erro
@@ -27,14 +26,14 @@ class CustomerController {
       where: { email: clientData.email },
     });
     if (customerExists) {
-      return res.status(400).json('Error: Email already exists!');
+      return res.status(400).json({ error: 'Usuário já existe!' });
     }
 
     try {
       // Persiste o cliente em base local.
       const customer = await Customer.create(clientData);
       // Persiste o cliente em base remota e retorna o customerID remoto
-      const remoteID = await MundiPagg.getCustomerRemoteID(clientData);
+      const remoteID = await MundiPagg.setCustomer(clientData);
 
       if (!remoteID) {
         /** Aqui deveria cadastrar os dados dos clientes que
@@ -53,7 +52,7 @@ class CustomerController {
 
       return res.status(200).json(customer);
     } catch (error) {
-      return res.status(400).json(`Error: ${error}`);
+      return res.status(400).json({ error });
     }
   }
 
