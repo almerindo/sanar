@@ -442,8 +442,6 @@ describe('CUSTOMERS', () => {
       .set('Authorization', `Bearer ${data.token}`)
       .send(subsc_data)
       .then(response => {
-        console.log('AAAAAAAAAAAA');
-        console.log(data.subscription.remote_id);
         expect(response.statusCode).toBe(200);
       });
   });
