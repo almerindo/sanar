@@ -33,7 +33,22 @@ class MundiPagg {
     const customersController = mundipagg.CustomersController;
     try {
       const customer = await customersController.createCustomer(request);
-      return customer.id;
+      return customer;
+    } catch (error) {
+      throw new Error(this.getErrorFormated(error, 400));
+    }
+  }
+
+  async setSubscription(subscriptionData) {
+    const subscriptionsController = mundipagg.SubscriptionsController;
+    const request = new mundipagg.CreateSubscriptionRequest();
+    request.planId = subscriptionData.planId;
+    request.payment_method = subscriptionData.paymentMethod;
+    request.customerId = subscriptionData.customerId;
+    request.card = subscriptionData.cardId;
+    try {
+      const result = await subscriptionsController.createSubscription(request);
+      return result;
     } catch (error) {
       throw new Error(this.getErrorFormated(error, 400));
     }

@@ -24,7 +24,12 @@ class CustomerController {
 
     // Se já existe cliente retorna erro
     const customerExists = await Customer.findOne({
-      where: { email: clientData.email },
+      where: {
+        email: clientData.email,
+        canceled_at: {
+          [Op.eq]: null,
+        },
+      },
     });
     if (customerExists) {
       return res.status(400).json({ error: 'Usuário já existe!' });
@@ -34,21 +39,9 @@ class CustomerController {
       // Persiste o cliente em base local.
       const customer = await Customer.create(clientData);
       // Persiste o cliente em base remota e retorna o customerID remoto
-      const remoteID = await MundiPagg.setCustomer(clientData);
+      const remoteCustomer = await MundiPagg.setCustomer(clientData);
 
-      if (!remoteID) {
-        /** Aqui deveria cadastrar os dados dos clientes que
-         * não conseguiram se registrar no gateway de pagamento
-         * em um banco de dados chave-valor Redis.
-         * E usar um JOB , que verifica os dados que não obtiveram êxito
-         * e tenta novamente ou avisa a alguem por e-mail.
-         *
-         * Por emquanto vou só lançar o erro.
-         */
-
-        throw new Error('Erro ao registrar no MundiPagG');
-      }
-      clientData.remote_id = remoteID;
+      clientData.remote_id = remoteCustomer.id;
       await customer.update(clientData);
 
       return res.status(200).json(customer);

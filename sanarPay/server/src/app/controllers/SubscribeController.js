@@ -1,4 +1,3 @@
-import mundipagg from 'mundipagg-nodejs';
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
 
@@ -7,7 +6,7 @@ import Card from '../models/Card';
 import Subscription from '../models/Subscription';
 import Plan from '../models/Plan';
 
-import mundipaggConfig from '../../config/mundipagg';
+import MundiPagg from './util/MundiPagg';
 
 /**
  * {
@@ -36,20 +35,58 @@ class SubscribeController {
   // Persistir Local e remotamente
   async store(req, res) {
     const schema = Yup.object().shape({
-      plan_id: Yup.string().required('Informe o ID do plano!'),
-      payment_method: Yup.string().required('Informe o método de pagamento!'),
-      card_id: Yup.string().required('Informe o ID do Cartao!'),
-      /* Erro na API: Pois deveria aceitar soente o card_id.
-      Como não aceita o card_id, estou sendo obrigado a armazenar os
-      dados do cartão em banco local também
-
-      Para mudar o pagamento da assinatura, basta passar o card_id da carteira
-      do cliente. Porém, para assinar precisa de todos os dados      */
+      planId: Yup.string().required('Informe o ID do plano!'),
+      paymentMethod: Yup.string().required('Informe o método de pagamento!'),
+      cardId: Yup.string().required('Informe o ID do Cartao!'),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: `Validation fails` });
     }
+
+    if (req.params.cus !== String(req.userRemoteID)) {
+      return res
+        .status(405)
+        .json({ error: 'User ID não pertence ao Token Informado!' });
+    }
+
+    const customer = await Customer.findOne({
+      where: {
+        remote_id: req.userRemoteID,
+        canceled_at: {
+          [Op.eq]: null,
+        },
+      },
+    });
+
+    if (!customer) {
+      return res
+        .status(404)
+        .json({ error: 'Usuário inválido!' });
+    }
+
+    if (!customer.cards.length) {
+      return res.status(404).json({
+        error: 'Customer não possui cartoes cadastrados em sua carteira!',
+      });
+    }
+    // Encontra o cartao e seus dados armazenados localment
+    const cardLocal = customer.cards.find(card => {
+      return card.remote_id === card_id;
+    });
+    if (!cardLocal) {
+      return res.status(404).json({
+        error: `O cartao ${card_id} não está associado ao Cliente ${customer}`,
+      });
+    }
+
+
+    const subscriptionData = {
+      planId: req.body.planId,
+      paymentMethod: req.body.paymentMethod,
+      customerId: customer.remote_id,
+      cardId: req.body.cardId,
+    };
 
     /*
     Capturar o customer pelo seu ID
@@ -57,47 +94,21 @@ class SubscribeController {
     assinar o Plano
     Persistir local (só era necessário persistir o card_id) e remotamente.
     */
-    const { plan_id, payment_method, card_id } = req.body;
     const customer = await Customer.findOne({
       where: { id: req.userID },
-      include: [
-        {
-          model: Card,
-          as: 'cards',
-        },
-        {
-          model: Subscription,
-          as: 'subscriptions',
-        },
-      ],
     });
 
     if (!customer) {
-      return res.status(404).json('Customer não encontrado!');
+      return res.status(404).json({ error: 'Customer não encontrado!' });
     }
 
-    // Verificar se o ID do cartão passado está associado ao cliente
-    if (!customer.cards.length) {
-      return res
-        .status(404)
-        .json('Customer não possui cartoes cadastrados em sua carteira!');
-    }
-    // Encontra o cartao e seus dados armazenados localment
-    const cardLocal = customer.cards.find(card => {
-      return card.remote_id === card_id;
-    });
-    if (!cardLocal) {
-      return res
-        .status(404)
-        .json(`O cartao ${card_id} não está associado ao Cliente ${customer} `);
-    }
 
     const remote_id = plan_id;
     const plan = await Plan.findOne({ where: { remote_id } });
     if (!plan) {
-      return res
-        .status(404)
-        .json(`O plano ${plan_id} não está cadastrado no sistema local!`);
+      return res.status(404).json({
+        error: `O plano ${plan_id} não está cadastrado no sistema local!`,
+      });
     }
 
     // Verificar se o usuário já assinou esse plano
@@ -109,11 +120,9 @@ class SubscribeController {
       },
     });
     if (subsExists) {
-      return res
-        .status(400)
-        .json(
-          `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${plan_id}`
-        );
+      return res.status(400).json({
+        error: `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${plan_id}`,
+      });
     }
 
     /*
@@ -122,40 +131,21 @@ class SubscribeController {
      Obs: não seria interessante armazenar os dados do cartao em banco, muito risco!
      mas a API obrigou, assinar um plano somente com os dados do cartão, sem o card_id
     */
-    const subscriptionsController = mundipagg.SubscriptionsController;
-    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
-    const request = new mundipagg.CreateSubscriptionRequest();
-    request.planId = plan_id;
-    request.payment_method = payment_method;
-    request.customerId = customer.remote_id;
-    request.card = cardLocal; // Dados do cartao, armazenado localmente
-    const subs = await subscriptionsController
-      .createSubscription(request)
-      .then(subscription => {
-        return subscription;
-      })
-      .catch(error => {
-        if (error.errorResponse instanceof mundipagg.ErrorException) {
-          // Capturando se erro for do mundipagg, para uso futuro
-          throw new Error({
-            error: {
-              message: error.errorResponse.message,
-              erros: error.errorResponse.errors,
-            },
-          });
-        } else {
-          throw error;
-        }
+
+    try {
+      const subs = await MundiPagg.setSubscription(subscriptionData);
+
+      // Armazena informações da assinatura, em base local
+      await Subscription.create({
+        remote_id: subs.id,
+        customer_id: customer.id,
+        plan_id: plan.id,
       });
 
-    // Armazena informações da assinatura, em base local
-    await Subscription.create({
-      remote_id: subs.id,
-      customer_id: customer.id,
-      plan_id: plan.id,
-    });
-
-    return res.status(200).json(subs);
+      return res.status(200).json(subs);
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
   }
 
   async update(req, res) {

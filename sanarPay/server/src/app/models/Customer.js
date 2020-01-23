@@ -1,4 +1,4 @@
-import Sequelize, { Model } from 'sequelize';
+import Sequelize, { Model, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 
 class Customer extends Model {
