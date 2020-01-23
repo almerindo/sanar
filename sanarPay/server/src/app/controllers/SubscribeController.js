@@ -50,19 +50,26 @@ class SubscribeController {
         .json({ error: 'User ID não pertence ao Token Informado!' });
     }
 
+    const { planId, paymentMethod, cardId } = req.body;
+
     const customer = await Customer.findOne({
       where: {
+        id: req.userID,
         remote_id: req.userRemoteID,
         canceled_at: {
           [Op.eq]: null,
         },
       },
+      include: [
+        {
+          model: Card,
+          as: 'cards',
+        },
+      ],
     });
 
     if (!customer) {
-      return res
-        .status(404)
-        .json({ error: 'Usuário inválido!' });
+      return res.status(404).json({ error: 'Usuário inválido!' });
     }
 
     if (!customer.cards.length) {
@@ -72,42 +79,29 @@ class SubscribeController {
     }
     // Encontra o cartao e seus dados armazenados localment
     const cardLocal = customer.cards.find(card => {
-      return card.remote_id === card_id;
+      return card.remote_id === cardId;
     });
     if (!cardLocal) {
       return res.status(404).json({
-        error: `O cartao ${card_id} não está associado ao Cliente ${customer}`,
+        error: `O cartao ${cardId} não está associado ao Cliente ${customer}`,
       });
     }
 
-
     const subscriptionData = {
-      planId: req.body.planId,
-      paymentMethod: req.body.paymentMethod,
+      planId,
+      paymentMethod,
+      cardId,
       customerId: customer.remote_id,
-      cardId: req.body.cardId,
     };
-
-    /*
-    Capturar o customer pelo seu ID
-    os Dados do plano desejado
-    assinar o Plano
-    Persistir local (só era necessário persistir o card_id) e remotamente.
-    */
-    const customer = await Customer.findOne({
-      where: { id: req.userID },
-    });
 
     if (!customer) {
       return res.status(404).json({ error: 'Customer não encontrado!' });
     }
 
-
-    const remote_id = plan_id;
-    const plan = await Plan.findOne({ where: { remote_id } });
+    const plan = await Plan.findOne({ where: { remote_id: planId } });
     if (!plan) {
       return res.status(404).json({
-        error: `O plano ${plan_id} não está cadastrado no sistema local!`,
+        error: `O plano ${planId} não encontrado!`,
       });
     }
 
@@ -121,18 +115,12 @@ class SubscribeController {
     });
     if (subsExists) {
       return res.status(400).json({
-        error: `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${plan_id}`,
+        error: `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${planId}`,
       });
     }
 
-    /*
-     Aqui encontrei o cliente e o cartao.
-     Pesquisei o cliente localmente pra evitar acesso a rede
-     Obs: não seria interessante armazenar os dados do cartao em banco, muito risco!
-     mas a API obrigou, assinar um plano somente com os dados do cartão, sem o card_id
-    */
-
     try {
+      // Faz a assinatura na Mundipagg
       const subs = await MundiPagg.setSubscription(subscriptionData);
 
       // Armazena informações da assinatura, em base local
