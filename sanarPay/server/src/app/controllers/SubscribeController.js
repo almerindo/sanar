@@ -110,6 +110,7 @@ class SubscribeController {
       }
 
       const result = await MundiPagg.getSubscription(subscription.remote_id);
+
       return res.status(200).json(result);
     } catch (error) {
       return res
@@ -133,17 +134,17 @@ class SubscribeController {
       });
 
       if (!subscription) {
-        return res.status(404).json({
-          error: `User ${req.userRemoteID} não possui a assinatura ${subscriptionId}`,
-        });
+        subscription.canceled_at = new Date();
+        await subscription.save();
+        // return res.status(404).json({
+        //   error: `User ${req.userRemoteID} não possui a assinatura ${subscriptionId}`,
+        // });
       }
-
-      await subscription.save();
+      // Retorna dados da SUb cancelada
       const result = await MundiPagg.cancelSubscription(subscriptionId);
       if (!result) {
         return res.status(404).json('Não existe assinatura no banco remoto!');
       }
-      subscription.canceled_at = new Date();
 
       return res.status(200).json(result);
     } catch (error) {
