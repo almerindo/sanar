@@ -77,25 +77,24 @@ class WalletController {
   }
 
   async delete(req, res) {
-    const schema = Yup.object().shape({
-      cardId: Yup.string().required(),
-    });
+    // FIXME Pedir a senha
+    try {
+      const card = await MundiPagg.deleteWallet({
+        customerId: req.userRemoteID,
+        cardId: req.params.card,
+      });
+      req.cardFound.canceled_at = new Date();
+      await req.cardFound.save();
+      // Apagar da base local também
+      // await cardExist.destroy();
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: `Validation fails` });
+      return res.status(200).json({ remoteCard: card });
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Não foi possivel remover o cartao da wallet',
+        detail: error,
+      });
     }
-
-    const card = await MundiPagg.deleteWallet({
-      customerId: req.params.userRemoteID,
-      cardId: req.params.card,
-    });
-
-    req.cardFound.canceled_at = new Date();
-    await req.cardFound.save();
-    // Apagar da base local também
-    // await cardExist.destroy();
-
-    return res.status(200).json({ remoteCard: card });
   }
 
   async index(req, res) {

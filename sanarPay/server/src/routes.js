@@ -33,7 +33,7 @@ routes.post(
   checkIsValidUser,
   checkUserPermition,
   WalletController.store
-); // FIXME
+); // OK
 routes.delete(
   '/customers/:cus/wallet/:card',
   checkIsValidUser,
