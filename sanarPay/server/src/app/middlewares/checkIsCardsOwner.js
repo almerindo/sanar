@@ -19,8 +19,10 @@ export default async (req, res, next) => {
       return card.remote_id === index ? card : null;
     });
     if (!cardLocal) {
+      const cardInformed = req.params.card ? req.params.card : cardId;
+
       return res.status(404).json({
-        error: `O cartao ${cardId} não está associado ao Cliente ${req.userRemoteID}`,
+        error: `O cartao ${cardInformed} não está associado ao Cliente ${req.userRemoteID}`,
       });
     }
     req.cardFound = cardLocal;

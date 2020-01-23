@@ -49,8 +49,6 @@ class WalletController {
           error: 'Não foi possivel guardar o cartão !',
         });
       }
-      console.log('wallet');
-      console.log(wallet);
 
       const data = {
         remote_id: wallet.id,
@@ -61,9 +59,6 @@ class WalletController {
         exp_year: req.body.card.exp_year,
         cvv: req.body.card.cvv,
       };
-      console.log('data');
-
-      console.log(data);
 
       await Card.create(data);
 
@@ -77,7 +72,6 @@ class WalletController {
   }
 
   async delete(req, res) {
-    // FIXME Pedir a senha
     try {
       const card = await MundiPagg.deleteWallet({
         customerId: req.userRemoteID,
