@@ -38,7 +38,11 @@ routes.post(
   SubscribeController.store
 ); // FIXME
 
-routes.get('/customers/:cus/subscriptions/:subs', SubscribeController.index); // OK
+routes.get(
+  '/customers/:cus/subscriptions/:subs',
+  checkIsValidUser,
+  SubscribeController.index
+); // OK
 
 routes.put(
   '/customers/subscriptions',

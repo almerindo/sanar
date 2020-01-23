@@ -68,5 +68,35 @@ class MundiPagg {
       throw new Error(error);
     }
   }
+
+  async getSubscription(subscriptionId) {
+    const subscriptionsController = mundipagg.SubscriptionsController;
+
+    try {
+      const subscription = await subscriptionsController.getSubscription(
+        subscriptionId
+      );
+
+      return subscription;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async cancelSubscription(subscriptionId) {
+    const subscriptionsController = mundipagg.SubscriptionsController;
+    const request = new mundipagg.CreateCancelSubscriptionRequest();
+    request.cancel_pending_invoices = true;
+
+    try {
+      const result = await subscriptionsController.cancelSubscription(
+        subscriptionId,
+        request
+      );
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 export default new MundiPagg();
