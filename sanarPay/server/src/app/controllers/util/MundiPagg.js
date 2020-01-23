@@ -6,20 +6,6 @@ class MundiPagg {
     mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
   }
 
-  // Padroniza mensagens de erro
-  getErrorFormated(error, status) {
-    const errorMsg = { error: '' };
-
-    errorMsg.status = status;
-    if (error.errorResponse instanceof mundipagg.ErrorException) {
-      // Capturando se erro for do mundipagg, para uso futuro
-      errorMsg.error = error.errorResponse.message;
-    } else {
-      errorMsg.error = error;
-    }
-    return errorMsg;
-  }
-
   /**
    * Cria o Customer na base da MundiPagG
    * @param {name, email, password} clientData
@@ -35,7 +21,7 @@ class MundiPagg {
       const customer = await customersController.createCustomer(request);
       return customer;
     } catch (error) {
-      throw new Error(this.getErrorFormated(error, 400));
+      throw error;
     }
   }
 
@@ -50,7 +36,7 @@ class MundiPagg {
       const result = await subscriptionsController.createSubscription(request);
       return result;
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -65,7 +51,7 @@ class MundiPagg {
       );
       return result;
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -79,7 +65,7 @@ class MundiPagg {
 
       return subscription;
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -95,7 +81,67 @@ class MundiPagg {
       );
       return result;
     } catch (error) {
-      throw new Error(error);
+      throw error;
+    }
+  }
+
+  async createPlan(planData) {
+    const plansController = mundipagg.PlansController;
+
+    const request = new mundipagg.CreatePlanRequest();
+    request.name = planData.name;
+    request.currency = planData.currency;
+    request.interval = planData.interval;
+    request.interval_count = planData.interval_count;
+    request.billing_type = planData.billing_type;
+    request.minimum_price = planData.minimum_price;
+    request.installments = planData.installments;
+    request.trial_period_days = planData.trial_period_days;
+    request.payment_methods = planData.payment_methods;
+    request.items = planData.items;
+
+    try {
+      const order = await plansController.createPlan(request);
+      return order;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deletePlan(planId) {
+    const plansController = mundipagg.PlansController;
+    try {
+      const planDeleted = await plansController.deletePlan(planId);
+      return planDeleted;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createWallet(walletData) {
+    const customersController = mundipagg.CustomersController;
+
+    const request = new mundipagg.CreateCardRequest();
+    request.customer_id = walletData.customer_id;
+    request.number = walletData.card.number;
+    request.holder_name = walletData.card.holder_name;
+    request.holder_document = walletData.card.holder_document;
+    request.exp_month = walletData.card.exp_month;
+    request.exp_year = walletData.card.exp_year;
+    request.cvv = walletData.card.cvv;
+    try {
+      const result = customersController
+        .getCustomer(walletData.customer_id)
+        .then(customer => {
+          return customersController.createCard(customer.id, request);
+        })
+        .then(card => {
+          return card;
+        });
+
+      return result;
+    } catch (error) {
+      throw error;
     }
   }
 }

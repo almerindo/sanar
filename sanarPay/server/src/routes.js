@@ -3,6 +3,7 @@ import authMiddleware from './app/middlewares/auth';
 import checkAdminUser from './app/middlewares/checkAdmin';
 import checkIsValidUser from './app/middlewares/checkIsValidUser';
 import checkIsValidCard from './app/middlewares/checkIsValidCard';
+import checkUserPermition from './app/middlewares/checkUserPermition';
 
 import SessionController from './app/controllers/SessionController';
 import CustomerController from './app/controllers/CustomerController';
@@ -27,13 +28,29 @@ routes.delete('/plans/:plan', checkAdminUser, PlanController.delete); // FIXME
 routes.use(authMiddleware); // OK
 
 // Cria cartao para um cliente ID
-routes.post('/customers/wallet', WalletController.store); // OK
-routes.delete('/customers/:cus/wallet', WalletController.delete); // FIXME
-routes.get('/customers/wallet', WalletController.index); // OK
+routes.post(
+  '/customers/:cus/wallet',
+  checkIsValidUser,
+  checkUserPermition,
+  WalletController.store
+); // OK
+routes.delete(
+  '/customers/:cus/wallet',
+  checkIsValidUser,
+  checkUserPermition,
+  WalletController.delete
+);
+routes.get(
+  '/customers/:cus/wallet',
+  checkIsValidUser,
+  checkUserPermition,
+  WalletController.index
+); // OK
 
 routes.post(
   '/customers/:cus/subscriptions',
   checkIsValidUser,
+  checkUserPermition,
   checkIsValidCard,
   SubscribeController.store
 ); // FIXME
@@ -41,27 +58,27 @@ routes.post(
 routes.get(
   '/customers/:cus/subscriptions/:subs',
   checkIsValidUser,
+  checkUserPermition,
   SubscribeController.index
 ); // OK
 
 routes.put(
-  '/customers/subscriptions',
+  '/customers/:cus/subscriptions/:subs',
   checkIsValidUser,
+  checkUserPermition,
   checkIsValidCard,
   SubscribeController.update
 ); // OK
 routes.delete(
   '/customers/:cus/subscriptions/:subs',
   checkIsValidUser,
+  checkUserPermition,
   SubscribeController.delete
 ); // FIXME
 
 // Customers Update de informações do usuário local e remoto
 routes.delete('/customers/:cus', CustomerController.delete); // FIXME
 
-routes.put('/customers', CustomerController.update); // OK
+routes.put('/customers/:cus', CustomerController.update); // OK
 
-routes.get('/', (req, res) => {
-  return res.status(200).json({ token: req.body.token });
-});
 export default routes;

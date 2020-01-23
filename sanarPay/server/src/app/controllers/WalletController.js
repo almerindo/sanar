@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 import Customer from '../models/Customer';
 import Card from '../models/Card';
 
+import MundiPagg from './util/MundiPagg';
+
 class WalletController {
   async store(req, res) {
     const schema = Yup.object().shape({
@@ -22,92 +24,45 @@ class WalletController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: `Validation fails` });
     }
-    //
-
-    async function createMPCard() {
-      mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
-      const customersController = mundipagg.CustomersController;
-      const localCustomer = await Customer.findByPk(req.userID);
-
-      const request = new mundipagg.CreateCardRequest();
-      request.customer_id = req.body.customer_id;
-      request.number = req.body.card.number;
-      request.holder_name = req.body.card.holder_name;
-      request.holder_document = req.body.card.holder_document;
-      request.exp_month = req.body.card.exp_month;
-      request.exp_year = req.body.card.exp_year;
-      request.cvv = req.body.card.cvv;
-
-      const customerId = localCustomer.remote_id;
-
-      const result = customersController
-        .getCustomer(customerId)
-        .then(customer => {
-          return customersController.createCard(customer.id, request);
-        })
-        .then(card => {
-          return card;
-        })
-        .catch(error => {
-          if (error.errorResponse instanceof mundipagg.ErrorException) {
-            // Capturando se erro for do mundipagg, para uso futuro
-            throw new Error({
-              error: {
-                message: error.errorResponse.message,
-                erros: error.errorResponse.errors,
-              },
-            });
-          } else {
-            throw error;
-          }
-        });
-
-      return result;
-    }
-
-    // criando o cartao para o Cliente logado
-    const remoteCard = await createMPCard();
-    // console.log({ status: 'CRIADO', CartaoRemoto: remoteCard });
-
-    // Persistindo no banco local
-    if (!remoteCard) {
-      return res
-        .status(400)
-        .json('Não foi possivel guardar o cartão no servidor remoto');
-    }
-
-    const data = {
-      remote_id: remoteCard.id,
-      customer_id: req.userID,
-      holder_name: req.body.card.holder_name,
-      number: req.body.card.number,
-      exp_month: req.body.card.exp_month,
-      exp_year: req.body.card.exp_year,
-      cvv: req.body.card.cvv,
-    };
+    const { customer_id, card } = req.body;
 
     // Verifica se já tem um cartão com esse número cadastrado para esse client
     const cardExist = await Card.findOne({
-      where: { remote_id: remoteCard.id, customer_id: req.userID },
+      where: { number: card.number, customer_id: req.userID },
     });
 
     if (cardExist) {
       return res
         .status(400)
         .json(
-          `Cartao (Ultimos 4 Numeros: ${remoteCard.lastFourDigits}) já foi cadastrado para este cliente`
+          `Cartao (Ultimos 4 Numeros: ${card.number}) já foi cadastrado para este cliente`
         );
     }
 
     try {
-      const card = await Card.create(data);
+      const wallet = await MundiPagg.createWallet({ customer_id, card });
+      if (!wallet) {
+        return res.status(400).json({
+          error: 'Não foi possivel guardar o cartão !',
+        });
+      }
 
-      return res.status(200).json(card);
+      const data = {
+        remote_id: wallet.id,
+        customer_id: req.userID,
+        holder_name: req.body.card.holder_name,
+        number: req.body.card.number,
+        exp_month: req.body.card.exp_month,
+        exp_year: req.body.card.exp_year,
+        cvv: req.body.card.cvv,
+      };
+      const newCard = await Card.create(data);
+
+      return res.status(200).json(newCard);
     } catch (error) {
-      return res.status(400).json({
-        message: error.message,
-        name: error.name,
-      });
+      return res
+        .status(400)
+        .json({ error: 'Não foi possivel cadastrar novo cartao' });
     }
   }
 

@@ -59,6 +59,10 @@ class CustomerController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
+    if (req.params.cus !== String(req.userID)) {
+      return res.status(405).json({ error: 'Não tem permissão para update!' });
+    }
+
     // Verifica na base local se existe ou se já foi cancelado.
     const customerExists = await Customer.findOne({
       where: {
@@ -93,7 +97,7 @@ class CustomerController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails', status: 400 });
     }
-    if (req.params.id !== String(req.userID)) {
+    if (req.params.cus !== String(req.userID)) {
       return res.status(405).json({ error: 'Não tem permissão para deletar!' });
     }
 
