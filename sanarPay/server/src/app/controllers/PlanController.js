@@ -74,8 +74,14 @@ class PlanController {
       if (!plan) {
         return res.status(404).json(`Plan ${planId} não encontrado`);
       }
+      const result = await MundiPagg.deletePlan(planId);
+      if (!result) {
+        return res.status(400).json(`Erro ao excluir ${planId}`);
+      }
+
       plan.canceled_at = new Date();
       await plan.save();
+
       return res.status(200).json(plan);
     } catch (error) {
       return res

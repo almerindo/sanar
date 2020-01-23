@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authMiddleware from './app/middlewares/auth';
 import checkAdminUser from './app/middlewares/checkAdmin';
 import checkIsValidUser from './app/middlewares/checkIsValidUser';
-import checkIsValidCard from './app/middlewares/checkIsValidCard';
+import checkIsCardsOwner from './app/middlewares/checkIsCardsOwner';
 import checkUserPermition from './app/middlewares/checkUserPermition';
 
 import SessionController from './app/controllers/SessionController';
@@ -22,7 +22,7 @@ routes.post('/sessions', SessionController.store); // OK
 // Para criar os planos precisa ser
 // TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
 routes.post('/plans', checkAdminUser, PlanController.store); // OK
-routes.delete('/plans/:plan', checkAdminUser, PlanController.delete); // FIXME
+routes.delete('/plans/:plan', checkAdminUser, PlanController.delete); // OK
 
 // Rotas que necessitem de autenticacao do cliente
 routes.use(authMiddleware); // OK
@@ -33,17 +33,19 @@ routes.post(
   checkIsValidUser,
   checkUserPermition,
   WalletController.store
-); // OK
+); // FIXME
 routes.delete(
-  '/customers/:cus/wallet',
+  '/customers/:cus/wallet/:card',
   checkIsValidUser,
   checkUserPermition,
+  checkIsCardsOwner,
   WalletController.delete
 );
 routes.get(
-  '/customers/:cus/wallet',
+  '/customers/:cus/wallet/:card',
   checkIsValidUser,
   checkUserPermition,
+  checkIsCardsOwner,
   WalletController.index
 ); // OK
 
@@ -51,7 +53,7 @@ routes.post(
   '/customers/:cus/subscriptions',
   checkIsValidUser,
   checkUserPermition,
-  checkIsValidCard,
+  checkIsCardsOwner,
   SubscribeController.store
 ); // FIXME
 
@@ -66,7 +68,7 @@ routes.put(
   '/customers/:cus/subscriptions/:subs',
   checkIsValidUser,
   checkUserPermition,
-  checkIsValidCard,
+  checkIsCardsOwner,
   SubscribeController.update
 ); // OK
 routes.delete(

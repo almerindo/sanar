@@ -5,6 +5,7 @@ class Plan extends Model {
     super.init(
       {
         remote_id: Sequelize.STRING,
+        canceled_at: Sequelize.DATE,
       },
       { sequelize }
     );

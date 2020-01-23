@@ -1,5 +1,5 @@
-import mundipagg from 'mundipagg-nodejs';
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 
 import Customer from '../models/Customer';
 import Card from '../models/Card';
@@ -24,7 +24,7 @@ class WalletController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: `Validation fails` });
     }
-    const { customer_id, card } = req.body;
+    const { card } = req.body;
 
     // Verifica se já tem um cartão com esse número cadastrado para esse client
     const cardExist = await Card.findOne({
@@ -40,12 +40,17 @@ class WalletController {
     }
 
     try {
-      const wallet = await MundiPagg.createWallet({ customer_id, card });
+      const wallet = await MundiPagg.createWallet({
+        customer_id: req.userRemoteID,
+        card,
+      });
       if (!wallet) {
         return res.status(400).json({
           error: 'Não foi possivel guardar o cartão !',
         });
       }
+      console.log('wallet');
+      console.log(wallet);
 
       const data = {
         remote_id: wallet.id,
@@ -56,97 +61,45 @@ class WalletController {
         exp_year: req.body.card.exp_year,
         cvv: req.body.card.cvv,
       };
-      const newCard = await Card.create(data);
+      console.log('data');
 
-      return res.status(200).json(newCard);
+      console.log(data);
+
+      await Card.create(data);
+
+      return res.status(200).json(wallet);
     } catch (error) {
-      return res
-        .status(400)
-        .json({ error: 'Não foi possivel cadastrar novo cartao' });
+      return res.status(400).json({
+        error: 'Não foi possivel cadastrar novo cartao',
+        detail: error,
+      });
     }
   }
 
   async delete(req, res) {
     const schema = Yup.object().shape({
-      card: Yup.object()
-        .shape({
-          remote_id: Yup.string().required(),
-        })
-        .required('Informe os dados do cartão!'),
+      cardId: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: `Validation fails` });
     }
 
-    // Localiza o Cliente no banco de dados e captura os ID remotos
-    const localCustomer = await Customer.findByPk(req.userID);
-    const customerId = localCustomer.remote_id;
-    const remoteCardId = req.body.card.remote_id;
-    // verifica se o cartao está associado localmente a este cliente
-    const cardExist = await Card.findOne({
-      where: { remote_id: remoteCardId, customer_id: req.userID },
+    const card = await MundiPagg.deleteWallet({
+      customerId: req.params.userRemoteID,
+      cardId: req.params.card,
     });
 
-    if (!cardExist) {
-      return res.status(404).json({
-        error: `Cartão ${remoteCardId} não associado ao Usuário: ${customerId}`,
-      });
-    }
-
-    // Conecta e apaga o cartão do cliente
-    async function deleteMPCard() {
-      mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
-      const customersController = mundipagg.CustomersController;
-
-      const result = await customersController
-        .getCustomer(customerId)
-        .then(customer => {
-          return customersController.deleteCard(customer.id, remoteCardId);
-        })
-        .then(card => {
-          return card;
-        })
-        .catch(error => {
-          if (error.errorResponse instanceof mundipagg.ErrorException) {
-            // Capturando se erro for do mundipagg, para uso futuro
-            throw new Error({
-              error: {
-                message: error.errorResponse.message,
-                erros: error.errorResponse.errors,
-              },
-            });
-          } else {
-            throw error;
-          }
-        });
-
-      return result;
-    }
-
-    const card = await deleteMPCard();
+    req.cardFound.canceled_at = new Date();
+    await req.cardFound.save();
     // Apagar da base local também
-    await cardExist.destroy();
+    // await cardExist.destroy();
 
     return res.status(200).json({ remoteCard: card });
   }
 
   async index(req, res) {
-    // Captura o cliente logado
-
-    const items = await Customer.findOne({
-      where: { id: req.userID },
-      attributes: ['name', 'email', 'remote_id'],
-      include: [
-        {
-          model: Card,
-          as: 'cards',
-          attributes: ['remote_id'],
-        },
-      ],
-    });
-
-    return res.status(200).json(items);
+    return res.status(200).json(req.cards);
   }
 }
 export default new WalletController();

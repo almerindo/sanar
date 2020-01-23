@@ -1,4 +1,5 @@
 import mundipagg from 'mundipagg-nodejs';
+import * as Yup from 'yup';
 
 class MundiPagg {
   // Configura forma de autenciação no mundiPagG
@@ -119,6 +120,22 @@ class MundiPagg {
   }
 
   async createWallet(walletData) {
+    const schema = Yup.object().shape({
+      customer_id: Yup.string().required(),
+      card: Yup.object().shape({
+        number: Yup.string().required(),
+        holder_name: Yup.string().required(),
+        holder_document: Yup.string().required(),
+        exp_month: Yup.number().required(),
+        exp_year: Yup.number().required(),
+        cvv: Yup.number().required(),
+      }),
+    });
+
+    if (!(await schema.isValid(walletData))) {
+      throw new Error({ error: 'Validation fails' });
+    }
+
     const customersController = mundipagg.CustomersController;
 
     const request = new mundipagg.CreateCardRequest();
@@ -129,17 +146,32 @@ class MundiPagg {
     request.exp_month = walletData.card.exp_month;
     request.exp_year = walletData.card.exp_year;
     request.cvv = walletData.card.cvv;
-    try {
-      const result = customersController
-        .getCustomer(walletData.customer_id)
-        .then(customer => {
-          return customersController.createCard(customer.id, request);
-        })
-        .then(card => {
-          return card;
-        });
 
-      return result;
+    console.log(request);
+    try {
+      const customer = await customersController.getCustomer(
+        walletData.customer_id
+      );
+      const card = await customersController.createCard(customer.id, request);
+
+      return card;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteWallet(walletData) {
+    const customersController = mundipagg.CustomersController;
+    try {
+      const customer = await customersController.getCustomer(
+        walletData.customerId
+      );
+      const card = await customersController.deleteCard(
+        customer.id,
+        walletData.cardId
+      );
+
+      return card;
     } catch (error) {
       throw error;
     }
