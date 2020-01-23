@@ -57,7 +57,7 @@ describe('PLANS', () => {
     expect(response.statusCode).toBe(401);
   });
 
-  it('Deve se locar como usuário Admin', async () => {
+  it('Deve se logar como usuário Admin', async () => {
     data.user = {};
     data.user.email = 'admin@sanarflix.com.br';
     data.user.password = '1234567890';

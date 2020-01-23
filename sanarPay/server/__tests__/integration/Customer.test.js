@@ -112,4 +112,107 @@ describe('CUSTOMERS', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('id');
   });
+
+  it('Deve solicitar o password quando um Customer para apagar um cartao', async () => {
+    const response = await request(app)
+      .delete(`/customers/${data.user.id}/wallet/${data.user.card.id}`)
+      .set('Authorization', `Bearer ${data.user.token}`);
+    // .send({ password: data.user.password });
+
+    console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
+    console.log(response.body);
+    expect(response.statusCode).toBe(400);
+    // expect(response.body).toHaveProperty('remoteCard');
+  });
+
+  it('Deve retornar erro quando a wallet não existir', async () => {
+    const response = await request(app)
+      .delete(`/customers/${data.user.id}/wallet/card_invalidoalsjakljsj`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({ password: data.user.password });
+
+    expect(response.statusCode).toBe(404);
+  });
+
+  // Criar um plano e assinar
+
+  it('Deve se logar como usuário Admin', async () => {
+    data.admin = {};
+    data.admin.email = 'admin@sanarflix.com.br';
+    data.admin.password = '1234567890';
+
+    const response = await request(app)
+      .post('/sessions')
+      .send(data.admin);
+
+    data.admin.token = response.body.token;
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('token');
+  });
+
+  it('Deve criar o Plano Standard por 24.50 ', async () => {
+    // enviando os dados do plano e o token
+    data.plan = {
+      name: 'Plano Standard',
+      currency: 'BRL',
+      interval: 'month',
+      interval_count: 1,
+      billing_type: 'prepaid',
+      minimum_price: 2450,
+      installments: [1],
+      payment_methods: ['credit_card', 'boleto'],
+      items: [
+        {
+          name: 'Sanar Flix',
+          quantity: 1,
+          pricing_scheme: {
+            price: 2450,
+          },
+        },
+      ],
+    };
+    data.plan.password = '1234567890';
+    const response = await request(app)
+      .post('/plans')
+      .set('Authorization', `Bearer ${data.admin.token}`)
+      .send(data.plan);
+    data.plan.id = response.body.remote_id;
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('remote_id');
+  });
+
+  it('Deve dat erro se Customer tentar assinar um plano invalido', async () => {
+    const subscription = {
+      password: data.user.password,
+      cardId: data.user.card.id,
+      planId: 'plan_invalido_askljsaj',
+      paymentMethod: data.plan.paymentMethod,
+    };
+
+    const response = await request(app)
+      .post(`/customers/${data.user.id}/subscriptions`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send(subscription);
+
+    // console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
+    // console.log(response.body);
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('Deve permitir um Customer assinar um plano', async () => {
+    const subscription = {
+      password: data.user.password,
+      cardId: data.user.card.id,
+      planId: data.plan.id,
+      paymentMethod: 'credit_card',
+    };
+
+    const response = await request(app)
+      .post(`/customers/${data.user.id}/subscriptions`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send(subscription);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('id');
+  });
 });
