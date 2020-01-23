@@ -94,7 +94,7 @@ routes.delete(
   checkUserPermition,
   checkIsPasswordMatch,
   SubscribeController.delete
-); // FIXME
+); // OK
 
 // Customers Update de informações do usuário local e remoto
 routes.delete(

@@ -97,7 +97,8 @@ class CustomerController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails', status: 400 });
     }
-    if (req.params.cus !== String(req.userID)) {
+
+    if (req.params.cus !== String(req.userRemoteID)) {
       return res.status(405).json({ error: 'Não tem permissão para deletar!' });
     }
 
