@@ -20,6 +20,7 @@ routes.post('/customers', CustomerController.store); // OK
 // Login
 routes.post('/sessions', SessionController.store); // OK
 
+routes.use(authMiddleware); // OK
 // Para criar os planos precisa ser
 // TODO plano - Criar planos anual, trial 7dias, trimestral, promocional (com dois produtos e preço diferente a partir do primeiro mes)
 routes.post(
@@ -36,7 +37,6 @@ routes.delete(
 ); // OK
 
 // Rotas que necessitem de autenticacao do cliente
-routes.use(authMiddleware); // OK
 
 // Cria cartao para um cliente ID
 routes.post(
@@ -70,7 +70,7 @@ routes.post(
   checkIsPasswordMatch,
   checkIsCardsOwner,
   SubscribeController.store
-); // FIXME
+); // OK
 
 routes.get(
   '/customers/:cus/subscriptions/:subs',

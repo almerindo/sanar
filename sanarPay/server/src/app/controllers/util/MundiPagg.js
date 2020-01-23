@@ -32,7 +32,7 @@ class MundiPagg {
     request.planId = subscriptionData.planId;
     request.payment_method = subscriptionData.paymentMethod;
     request.customerId = subscriptionData.customerId;
-    request.card = subscriptionData.cardId;
+    request.cardId = subscriptionData.cardId;
     try {
       const result = await subscriptionsController.createSubscription(request);
       return result;

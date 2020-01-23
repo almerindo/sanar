@@ -50,7 +50,7 @@ class SubscribeController {
 
     try {
       // Faz a assinatura na Mundipagg
-      const subs = await MundiPagg.setSubscription(subscriptionData);
+      const subs = await MundiPagg.createSubscription(subscriptionData);
 
       // Armazena informações da assinatura, em base local
       await Subscription.create({
@@ -77,7 +77,10 @@ class SubscribeController {
     const { subscriptionId, cardId } = req.body;
 
     try {
-      const subs = await MundiPagg.setSubscription({ subscriptionId, cardId });
+      const subs = await MundiPagg.updateSubscription({
+        subscriptionId,
+        cardId,
+      });
       return res.status(200).json(subs);
     } catch (error) {
       return res
