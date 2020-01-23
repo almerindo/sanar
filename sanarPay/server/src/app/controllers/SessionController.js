@@ -21,13 +21,6 @@ class SessionController {
 
     const customer = await Customer.findOne({
       where: { email },
-      // include: [
-      //   {
-      //     model: Plan,
-      //     as: 'plan',
-      //     attributes: ['id', 'name'],
-      //   },
-      // ],
     });
 
     if (!customer) {
@@ -38,7 +31,7 @@ class SessionController {
       return res.status(401).json({ error: 'Password does not match.' });
     }
 
-    const { id, name } = customer;
+    const { id, remote_id, name } = customer;
 
     return res.json({
       customer: {
@@ -46,7 +39,7 @@ class SessionController {
         name,
         email,
       },
-      token: jwt.sign({ id }, authConfig.secret, {
+      token: jwt.sign({ id, remote_id }, authConfig.secret, {
         expiresIn: authConfig.expiresIn,
       }),
     });
