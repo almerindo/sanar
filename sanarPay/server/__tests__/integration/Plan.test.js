@@ -324,4 +324,14 @@ describe('PLANS', () => {
       .send({ password: data.plan.password });
     expect(response.statusCode).toBe(200);
   });
+
+  it('Deve acusar erro se o plano não foi encontrado', async () => {
+    data.plan.password = '1234567890';
+    data.plan.id = 'plan_invalidoxaassddk';
+    const response = await request(app)
+      .delete(`/plans/${data.plan.id}`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({ password: data.plan.password });
+    expect(response.statusCode).toBe(404);
+  });
 });
