@@ -30,7 +30,7 @@ routes.delete('/customers/:cus/wallet', WalletController.delete); // FIXME
 routes.get('/customers/wallet', WalletController.index); // OK
 
 routes.post('/customers/:cus/subscriptions', SubscribeController.store); // FIXME
-routes.get('/customers/subscriptions/:subs', SubscribeController.index); // OK
+routes.get('/customers/:cus/subscriptions/:subs', SubscribeController.index); // OK
 routes.put('/customers/subscriptions', SubscribeController.update); // OK
 routes.delete(
   '/customers/:cus/subscriptions/:subs',
