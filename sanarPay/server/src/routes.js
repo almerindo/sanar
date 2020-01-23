@@ -103,7 +103,7 @@ routes.delete(
   checkUserPermition,
   checkIsPasswordMatch,
   CustomerController.delete
-); // FIXME
+); // OK
 
 routes.put(
   '/customers/:cus',

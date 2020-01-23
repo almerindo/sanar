@@ -26,25 +26,26 @@ class CustomerController {
     const customerExists = await Customer.findOne({
       where: {
         email: clientData.email,
-        canceled_at: {
-          [Op.eq]: null,
-        },
       },
     });
-    if (customerExists) {
+
+    if (customerExists && !customerExists.canceled_at) {
       return res.status(400).json({ error: 'Usuário já existe!' });
     }
 
     try {
-      // Persiste o cliente em base local.
-      const customer = await Customer.create(clientData);
-      // Persiste o cliente em base remota e retorna o customerID remoto
       const remoteCustomer = await MundiPagg.createCustomer(clientData);
-
       clientData.remote_id = remoteCustomer.id;
-      await customer.update(clientData);
+      // Se ja esxiste ativa a conta
+      if (customerExists && customerExists.canceled_at) {
+        clientData.canceled_at = null;
+        await customerExists.update(clientData);
+      } else {
+        // Se nao atualiza
+        await Customer.create(clientData);
+      }
 
-      return res.status(200).json(customer);
+      return res.status(200).json(remoteCustomer);
     } catch (error) {
       return res.status(400).json({ error });
     }
@@ -59,7 +60,7 @@ class CustomerController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    if (req.params.cus !== String(req.userID)) {
+    if (req.params.cus !== String(req.userRemoteID)) {
       return res.status(405).json({ error: 'Não tem permissão para update!' });
     }
 

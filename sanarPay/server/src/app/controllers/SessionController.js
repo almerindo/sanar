@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
 import authConfig from '../../config/auth';
 import Customer from '../models/Customer';
@@ -23,6 +24,9 @@ class SessionController {
       where: { email },
     });
 
+    if (customer.canceled_at !== null) {
+      return res.status(401).json({ error: `Customer ${email} cancelado!.` });
+    }
     if (!customer) {
       return res.status(401).json({ error: `Customer ${email} not found.` });
     }
