@@ -39,7 +39,7 @@ class CustomerController {
       // Persiste o cliente em base local.
       const customer = await Customer.create(clientData);
       // Persiste o cliente em base remota e retorna o customerID remoto
-      const remoteCustomer = await MundiPagg.setCustomer(clientData);
+      const remoteCustomer = await MundiPagg.createCustomer(clientData);
 
       clientData.remote_id = remoteCustomer.id;
       await customer.update(clientData);

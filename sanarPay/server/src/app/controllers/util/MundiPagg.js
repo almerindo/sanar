@@ -25,7 +25,7 @@ class MundiPagg {
    * @param {name, email, password} clientData
    * @return ID or Error
    */
-  async setCustomer(clientData) {
+  async createCustomer(clientData) {
     const request = new mundipagg.CreateCustomerRequest();
     request.name = clientData.name;
     request.email = clientData.email;
@@ -39,7 +39,7 @@ class MundiPagg {
     }
   }
 
-  async setSubscription(subscriptionData) {
+  async createSubscription(subscriptionData) {
     const subscriptionsController = mundipagg.SubscriptionsController;
     const request = new mundipagg.CreateSubscriptionRequest();
     request.planId = subscriptionData.planId;
@@ -50,7 +50,22 @@ class MundiPagg {
       const result = await subscriptionsController.createSubscription(request);
       return result;
     } catch (error) {
-      throw new Error(this.getErrorFormated(error, 400));
+      throw new Error(error);
+    }
+  }
+
+  async updateSubscription(subscriptionData) {
+    const subscriptionsController = mundipagg.SubscriptionsController;
+    const request = new mundipagg.UpdateSubscriptionCardRequest();
+    request.cardId = subscriptionData.cardId;
+    try {
+      const result = await subscriptionsController.updateSubscriptionCard(
+        subscriptionData.subscriptionId,
+        request
+      );
+      return result;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }

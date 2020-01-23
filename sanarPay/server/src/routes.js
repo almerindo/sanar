@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import authMiddleware from './app/middlewares/auth';
 import checkAdminUser from './app/middlewares/checkAdmin';
+import checkIsValidUser from './app/middlewares/checkIsValidUser';
+import checkIsValidCard from './app/middlewares/checkIsValidCard';
 
 import SessionController from './app/controllers/SessionController';
 import CustomerController from './app/controllers/CustomerController';
@@ -29,11 +31,22 @@ routes.post('/customers/wallet', WalletController.store); // OK
 routes.delete('/customers/:cus/wallet', WalletController.delete); // FIXME
 routes.get('/customers/wallet', WalletController.index); // OK
 
-routes.post('/customers/:cus/subscriptions', SubscribeController.store); // FIXME
+routes.post(
+  '/customers/:cus/subscriptions',
+  checkIsValidUser,
+  checkIsValidCard,
+  SubscribeController.store
+); // FIXME
 routes.get('/customers/:cus/subscriptions/:subs', SubscribeController.index); // OK
-routes.put('/customers/subscriptions', SubscribeController.update); // OK
+routes.put(
+  '/customers/subscriptions',
+  checkIsValidUser,
+  checkIsValidCard,
+  SubscribeController.update
+); // OK
 routes.delete(
   '/customers/:cus/subscriptions/:subs',
+  checkIsValidUser,
   SubscribeController.delete
 ); // FIXME
 

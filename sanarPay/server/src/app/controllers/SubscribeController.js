@@ -52,51 +52,12 @@ class SubscribeController {
 
     const { planId, paymentMethod, cardId } = req.body;
 
-    const customer = await Customer.findOne({
-      where: {
-        id: req.userID,
-        remote_id: req.userRemoteID,
-        canceled_at: {
-          [Op.eq]: null,
-        },
-      },
-      include: [
-        {
-          model: Card,
-          as: 'cards',
-        },
-      ],
-    });
-
-    if (!customer) {
-      return res.status(404).json({ error: 'Usuário inválido!' });
-    }
-
-    if (!customer.cards.length) {
-      return res.status(404).json({
-        error: 'Customer não possui cartoes cadastrados em sua carteira!',
-      });
-    }
-    // Encontra o cartao e seus dados armazenados localment
-    const cardLocal = customer.cards.find(card => {
-      return card.remote_id === cardId;
-    });
-    if (!cardLocal) {
-      return res.status(404).json({
-        error: `O cartao ${cardId} não está associado ao Cliente ${customer}`,
-      });
-    }
-
     const subscriptionData = {
       planId,
       paymentMethod,
       cardId,
-      customerId: customer.remote_id,
+      customerId: req.userRemoteID,
     };
-
-    if (!customer) {
-      return res.status(404).json({ error: 'Customer não encontrado!' });
-    }
 
     const plan = await Plan.findOne({ where: { remote_id: planId } });
     if (!plan) {
@@ -108,14 +69,14 @@ class SubscribeController {
     // Verificar se o usuário já assinou esse plano
     const subsExists = await Subscription.findOne({
       where: {
-        customer_id: customer.id,
+        customer_id: req.userID,
         plan_id: plan.id,
         canceled_at: { [Op.eq]: null },
       },
     });
     if (subsExists) {
       return res.status(400).json({
-        error: `O Cliente: ${customer.remote_id} já tem uma assinatura para o plano ${planId}`,
+        error: `O Cliente: ${req.remote_id} já tem uma assinatura para o plano ${planId}`,
       });
     }
 
@@ -126,7 +87,7 @@ class SubscribeController {
       // Armazena informações da assinatura, em base local
       await Subscription.create({
         remote_id: subs.id,
-        customer_id: customer.id,
+        customer_id: req.userID,
         plan_id: plan.id,
       });
 
@@ -137,33 +98,30 @@ class SubscribeController {
   }
 
   async update(req, res) {
-    mundipagg.Configuration.basicAuthUserName = process.env.MUNDI_PK;
+    const schema = Yup.object().shape({
+      subscriptionId: Yup.string().required(),
+      paymentMethod: Yup.string().required(),
+      cardId: Yup.string().required(),
+    });
 
-    const subscriptionsController = mundipagg.SubscriptionsController;
-
-    const { subscription_id, card_id } = req.body;
-
-    const request = new mundipagg.UpdateSubscriptionCardRequest();
-    request.cardId = card_id;
-
-    const result = await subscriptionsController
-      .updateSubscriptionCard(subscription_id, request)
-      .then(subscription => {
-        return {
-          subscription_id: subscription.id,
-          new_card_id: subscription.card.id,
-          cardFirstSixDigits: subscription.card.firstSixDigits,
-          cardLastFourDigits: subscription.card.lastFourDigits,
-        };
-      })
-      .catch(error => {
-        return null;
-      });
-
-    if (!result) {
-      return res.status(400).json('Não foi possivel atualizar o cartao');
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: `Validation fails` });
     }
-    return res.status(200).json(result);
+
+    if (req.params.cus !== req.userRemoteID) {
+      return res.status(401).json(`Token não confere com o ${req.params.cus}`);
+    }
+
+    const { subscriptionId, cardId } = req.body;
+
+    try {
+      const subs = await MundiPagg.setSubscription({ subscriptionId, cardId });
+      return res.status(200).json(subs);
+    } catch (error) {
+      return res
+        .status(400)
+        .json('Não foi possivel atualizar a forma de pagamento');
+    }
   }
 
   async index(req, res) {
