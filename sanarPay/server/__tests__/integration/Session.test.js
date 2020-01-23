@@ -119,4 +119,16 @@ describe('SESSIONS', () => {
     console.log(response.body);
     expect(response.statusCode).toBe(200);
   });
+
+  it('Deve impedir se logar com um usuário cancelado', async () => {
+    data.email = 'almerindo.rehem@sanarflix.com.br';
+    data.password = '1234567890';
+    const response = await request(app)
+      .post(`/sessions`)
+      .set('Authorization', `Bearer ${data.token}`)
+      .send(data);
+    console.log('response.body');
+    console.log(response.body);
+    expect(response.statusCode).toBe(401);
+  });
 });
