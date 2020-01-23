@@ -54,7 +54,7 @@ class CustomerController {
   async update(req, res) {
     const schema = Yup.object().shape({
       newPassword: Yup.string().required(),
-      oldPassword: Yup.string().required(),
+      name: Yup.string(),
     });
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails' });
@@ -79,13 +79,11 @@ class CustomerController {
         error: 'Algo errado! Usuário não encontrado! ou já cancelado',
       });
     }
-    const { oldPassword, newPassword } = req.body;
-
-    if (oldPassword && !(await customerExists.checkPassword(oldPassword))) {
-      return res.status(401).json({ error: 'Password does not match.' });
-    }
+    const { name, newPassword } = req.body;
 
     customerExists.password = newPassword;
+    customerExists.name = name || customerExists.name;
+
     await customerExists.save();
     return res.status(200).json(customerExists);
   }
