@@ -37,7 +37,9 @@ routes.post(
   checkIsValidCard,
   SubscribeController.store
 ); // FIXME
+
 routes.get('/customers/:cus/subscriptions/:subs', SubscribeController.index); // OK
+
 routes.put(
   '/customers/subscriptions',
   checkIsValidUser,
