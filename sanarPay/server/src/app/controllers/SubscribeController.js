@@ -95,9 +95,6 @@ class SubscribeController {
     try {
       // Se não for informado retorna todas do usuário
       if (!subscriptionId) {
-        console.log('##################################################');
-        console.log('req.userRemoteID');
-        console.log(req.userRemoteID);
         result = await MundiPagg.getSubscriptions(req.userRemoteID);
         return res.status(200).json(result);
       }

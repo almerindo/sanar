@@ -54,6 +54,15 @@ routes.delete(
   checkIsCardsOwner,
   WalletController.delete
 ); // OK
+
+routes.get(
+  '/customers/:cus/wallet',
+  checkIsValidUser,
+  checkUserPermition,
+  checkIsPasswordMatch,
+  WalletController.index
+); // OK
+
 routes.get(
   '/customers/:cus/wallet/:card',
   checkIsValidUser,
@@ -74,6 +83,14 @@ routes.post(
 
 routes.get(
   '/customers/:cus/subscriptions/:subs',
+  checkIsValidUser,
+  checkUserPermition,
+  checkIsPasswordMatch,
+  SubscribeController.index
+); // OK
+
+routes.get(
+  '/customers/:cus/subscriptions',
   checkIsValidUser,
   checkUserPermition,
   checkIsPasswordMatch,
