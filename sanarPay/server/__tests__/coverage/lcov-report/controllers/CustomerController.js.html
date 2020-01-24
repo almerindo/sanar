@@ -22,30 +22,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.25% </span>
+                <span class="strong">71.88% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>36/64</span>
+                <span class='fraction'>46/64</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.5% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>19/40</span>
+                <span class='fraction'>24/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58% </span>
+                <span class="strong">78% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>29/50</span>
+                <span class='fraction'>39/50</span>
             </div>
         
             
@@ -256,20 +256,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -278,18 +278,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -401,21 +401,21 @@ class CustomerController {
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  as</span>ync update(req, res) {
-    const schema = <span class="cstat-no" title="statement not covered" >Yup.object().shape({</span>
+  async update(req, res) {
+    const schema = Yup.object().shape({
       newPassword: Yup.string().required(),
       name: Yup.string(),
     });
-<span class="cstat-no" title="statement not covered" >    if (!(await schema.isValid(req.body))) {</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!(await schema.isValid(req.body))) {
 <span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Validation fails' });</span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (req.params.cus !== String(req.userRemoteID)) {</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (req.params.cus !== String(req.userRemoteID)) {
 <span class="cstat-no" title="statement not covered" >      return res.status(405).json({ error: 'Não tem permissão para update!' });</span>
     }
 &nbsp;
     // Verifica na base local se existe ou se já foi cancelado.
-    const customerExists = <span class="cstat-no" title="statement not covered" >await Customer.findOne({</span>
+    const customerExists = await Customer.findOne({
       where: {
         id: req.userID,
         canceled_at: {
@@ -424,18 +424,18 @@ class CustomerController {
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!customerExists) {</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!customerExists) {
 <span class="cstat-no" title="statement not covered" >      return res.status(404).json({</span>
         error: 'Algo errado! Usuário não encontrado! ou já cancelado',
       });
     }
-    const { name, newPassword } = <span class="cstat-no" title="statement not covered" >req.body;</span>
+    const { name, newPassword } = req.body;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    customerExists.password = newPassword;</span>
-<span class="cstat-no" title="statement not covered" >    customerExists.name = name || customerExists.name;</span>
+    customerExists.password = newPassword;
+    customerExists.name = name || customerExists.name;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    await customerExists.save();</span>
-<span class="cstat-no" title="statement not covered" >    return res.status(200).json(customerExists);</span>
+    await customerExists.save();
+    return res.status(200).json(customerExists);
   }
 &nbsp;
   async delete(req, res) {
@@ -501,7 +501,7 @@ export default new CustomerController();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Jan 23 2020 20:15:24 GMT-0300 (Brasilia Standard Time)
+                at Thu Jan 23 2020 21:50:55 GMT-0300 (Brasilia Standard Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

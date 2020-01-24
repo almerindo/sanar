@@ -107,10 +107,20 @@ describe('SESSIONS', () => {
     expect(response.statusCode).toBe(405);
   });
 
+  it('Deve trocar senha do usuário', async () => {
+    const response = await request(app)
+      .put(`/customers/${data.id}`)
+      .set('Authorization', `Bearer ${data.token}`)
+      .send({ password: data.password, newPassword: '12345678901' });
+    console.log('response.body');
+    console.log(response.body);
+    expect(response.statusCode).toBe(200);
+  });
+
   it('Deve permitir cancelar um usuário se token corresponder com o do usuário', async () => {
     data.name = 'Almerindo Rehem';
     data.email = 'almerindo.rehem@sanarflix.com.br';
-    data.password = '1234567890';
+    data.password = '12345678901';
     const response = await request(app)
       .delete(`/customers/${data.id}`)
       .set('Authorization', `Bearer ${data.token}`)
@@ -122,7 +132,7 @@ describe('SESSIONS', () => {
 
   it('Deve impedir se logar com um usuário cancelado', async () => {
     data.email = 'almerindo.rehem@sanarflix.com.br';
-    data.password = '1234567890';
+    data.password = '12345678901';
     const response = await request(app)
       .post(`/sessions`)
       .set('Authorization', `Bearer ${data.token}`)

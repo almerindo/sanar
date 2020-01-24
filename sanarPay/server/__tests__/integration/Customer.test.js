@@ -117,12 +117,7 @@ describe('CUSTOMERS', () => {
     const response = await request(app)
       .delete(`/customers/${data.user.id}/wallet/${data.user.card.id}`)
       .set('Authorization', `Bearer ${data.user.token}`);
-    // .send({ password: data.user.password });
-
-    console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
-    console.log(response.body);
     expect(response.statusCode).toBe(400);
-    // expect(response.body).toHaveProperty('remoteCard');
   });
 
   it('Deve retornar erro quando a wallet não existir', async () => {
@@ -181,7 +176,7 @@ describe('CUSTOMERS', () => {
     expect(response.body).toHaveProperty('remote_id');
   });
 
-  it('Deve dat erro se Customer tentar assinar um plano invalido', async () => {
+  it('Deve dar erro se Customer tentar assinar um plano invalido', async () => {
     const subscription = {
       password: data.user.password,
       cardId: data.user.card.id,
@@ -200,7 +195,7 @@ describe('CUSTOMERS', () => {
   });
 
   it('Deve permitir um Customer assinar um plano', async () => {
-    const subscription = {
+    data.user.subscription = {
       password: data.user.password,
       cardId: data.user.card.id,
       planId: data.plan.id,
@@ -210,9 +205,146 @@ describe('CUSTOMERS', () => {
     const response = await request(app)
       .post(`/customers/${data.user.id}/subscriptions`)
       .set('Authorization', `Bearer ${data.user.token}`)
-      .send(subscription);
+      .send(data.user.subscription);
+    data.user.subscription.id = response.body.id;
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('id');
+  });
+
+  it('Deve permitir um Customer adicionar um segundo cartao em sua wallet', async () => {
+    const { token, id, subscription, card } = data.user;
+    data.user = {
+      id,
+      token,
+      password: '1234567890',
+      subscription,
+      card,
+      card2: {
+        number: '5220301945255839',
+        holder_name: 'Mario Santos',
+        holder_document: '70308286073',
+        exp_month: 7,
+        exp_year: 21,
+        cvv: '522',
+        brand: 'Mastercard',
+        private_label: false,
+        options: {
+          verify_card: true,
+        },
+      },
+    };
+
+    const response = await request(app)
+      .post(`/customers/${data.user.id}/wallet`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({ password: data.user.password, card: data.user.card2 });
+
+    data.user.card2.id = response.body.id;
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('id');
+  });
+
+  it('Deve dar erro se um Customer adicionar o mesmo cartao em sua wallet', async () => {
+    const { token, id, subscription, card, card2 } = data.user;
+    data.user = {
+      id,
+      token,
+      password: '1234567890',
+      subscription,
+      card,
+      card2,
+      card3: {
+        number: '5220301945255839',
+        holder_name: 'Mario Santos',
+        holder_document: '70308286073',
+        exp_month: 7,
+        exp_year: 21,
+        cvv: '522',
+        brand: 'Mastercard',
+        private_label: false,
+        options: {
+          verify_card: true,
+        },
+      },
+    };
+
+    const response = await request(app)
+      .post(`/customers/${data.user.id}/wallet`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({ password: data.user.password, card: data.user.card3 });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('Deve solicitar a senha para atualizar uma assinatura', async () => {
+    const response = await request(app)
+      .put(
+        `/customers/${data.user.id}/subscriptions/${data.user.subscription.id}`
+      )
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({
+        subscriptionId: data.user.subscription.id,
+        cardId: data.user.card2.id,
+      });
+    expect(response.statusCode).toBe(400);
+    // expect(response.body).toHaveProperty('id');
+  });
+
+  it('Deve dar erro caso customer atualizar um plano com um cartão que não pertence a sua wallet', async () => {
+    const response = await request(app)
+      .put(
+        `/customers/${data.user.id}/subscriptions/${data.user.subscription.id}`
+      )
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({
+        password: data.user.password,
+        subscriptionId: data.user.subscription.id,
+        cardId: 'card_invalido_aslkjaslja',
+      });
+    console.log(
+      'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
+    );
+    console.log(response.body);
+    expect(response.statusCode).toBe(404);
+    // expect(response.body).toHaveProperty('id');
+  });
+
+  it('Deve permitir um Customer mudar a assinatura para cobrar de outro cartão', async () => {
+    const response = await request(app)
+      .put(
+        `/customers/${data.user.id}/subscriptions/${data.user.subscription.id}`
+      )
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({
+        password: data.user.password,
+        subscriptionId: data.user.subscription.id,
+        cardId: data.user.card2.id,
+      });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('id');
+  });
+
+  it('Deve permitir um Customer cancelar a assinatura', async () => {
+    const response = await request(app)
+      .delete(
+        `/customers/${data.user.id}/subscriptions/${data.user.subscription.id}`
+      )
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({
+        password: data.user.password,
+      });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('Deve permitir um Customer apagar um cartao em sua wallet', async () => {
+    const response = await request(app)
+      .delete(`/customers/${data.user.id}/wallet/${data.user.card2.id}`)
+      .set('Authorization', `Bearer ${data.user.token}`)
+      .send({ password: data.user.password });
+
+    expect(response.statusCode).toBe(200);
   });
 });
