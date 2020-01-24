@@ -89,6 +89,7 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 ❯ mkdir desafiosanar
 ❯ cd ./desafiosanar
 ❯ git clone https://github.com/almerindo/sanar.git sanarDEMO
+❯ cd ./sanarDEMO/sanarPay/server/
 ❯ git branch
 ❯ git checkout dev
 ❯ git branch
@@ -97,7 +98,6 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 Entre no diretório que voce clonou do github, rode o yarn para verificar as dependencias 
 
 ```js
-❯ cd ./sanarDEMO/sanarPay/server/
 
 ❯ yarn
 ```
