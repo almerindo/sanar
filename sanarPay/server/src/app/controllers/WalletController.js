@@ -93,6 +93,9 @@ class WalletController {
   }
 
   async index(req, res) {
+    if (req.params.card) {
+      return res.status(200).json(req.cardFound);
+    }
     return res.status(200).json(req.cards);
   }
 }
