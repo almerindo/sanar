@@ -18,6 +18,7 @@ export default async (req, res, next) => {
       const index = req.params.card ? req.params.card : cardId;
       return card.remote_id === index ? card : null;
     });
+
     if (!cardLocal) {
       const cardInformed = req.params.card ? req.params.card : cardId;
 

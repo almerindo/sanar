@@ -25,6 +25,10 @@ export default async (req, res, next) => {
     }
 
     req.cards = customer.cards;
+    console.log(
+      '#################################################################################'
+    );
+    console.log(req.cards);
 
     return next();
   } catch (err) {

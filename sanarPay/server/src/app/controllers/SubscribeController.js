@@ -91,8 +91,17 @@ class SubscribeController {
 
   async index(req, res) {
     const subscriptionId = req.params.subs;
-
+    let result;
     try {
+      // Se não for informado retorna todas do usuário
+      if (!subscriptionId) {
+        console.log('##################################################');
+        console.log('req.userRemoteID');
+        console.log(req.userRemoteID);
+        result = await MundiPagg.getSubscriptions(req.userRemoteID);
+        return res.status(200).json(result);
+      }
+
       const subscription = await Subscription.findOne({
         where: {
           customer_id: req.userID,
@@ -108,14 +117,13 @@ class SubscribeController {
           error: `User ${req.userRemoteID} não possui a assinatura ${subscriptionId}`,
         });
       }
-
-      const result = await MundiPagg.getSubscription(subscription.remote_id);
+      result = await MundiPagg.getSubscription(subscriptionId);
 
       return res.status(200).json(result);
     } catch (error) {
       return res
         .status(404)
-        .json({ error: `Não foi possivel buscar assinatura` });
+        .json({ error: `Não foi possivel buscar assinatura`, detail: error });
     }
   }
 

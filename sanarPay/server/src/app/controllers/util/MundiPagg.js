@@ -70,6 +70,26 @@ class MundiPagg {
     }
   }
 
+  async getSubscriptions(customerId) {
+    const subscriptionsController = mundipagg.SubscriptionsController;
+
+    try {
+      const subscription = await subscriptionsController.getSubscriptions({
+        customerId,
+      });
+      const result = [];
+      for (let i = 0; i < subscription.data.length; i += 1) {
+        if (subscription.data[i].customer.id === customerId) {
+          result.push(subscription.data[i]);
+        }
+      }
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async cancelSubscription(subscriptionId) {
     const subscriptionsController = mundipagg.SubscriptionsController;
     const request = new mundipagg.CreateCancelSubscriptionRequest();
