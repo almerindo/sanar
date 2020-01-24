@@ -67,20 +67,14 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 
 # Vídeos demonstrativos de como instalar, configurar e usar todo o ambiente e a API implementada: 
 ## Playlist no youtube só sobre o desafio SanarFlix, pode ser acessada em: https://www.youtube.com/playlist?list=PLWgTXjuvJE-bnv5mMhWWu3b5lWALBBTcn ou individualmente em cada um dos links a seguir conforme seu tema:
-- [X] V1 - Introdução ao desafio da SANAR -> 
-- [X] V2 - Introdução ao Docker para rodar Postgresql -> -
-- [X] V3 - Introdução às chaves de acesso da MultipagG e criando ambiente de testes e ambiente de desenvolvimento-> 
-- [X] V4 - Clonando e Configurando a API SanarPay e Rodando os testes automatizados-> 
-- [X] V5 - Introdução à estrutura da API SanarPay, arquivos e pastas -> 
-- [X] V6 - Explicando as rotas da API SanarPay desenvolvida -> 
-- [X] V7 - Configurando, os tokens, variáveis de ambiente e as requisições, do Insomnia para rodar os exemplos do __Desafio Sanar__ ->
-- [X] V8 - Criando os Planos de assinaturas com itens e preços do __Desafio Sanar__ ->
-- [X] V12 - Mostra resolvendo o __Caso 1__: Mario assina o plano Standard -> 
-- [X] V13 - Mostra resolvendo o __Caso 2__: Juliana assina o plano Trial 7D -> 
-- [X] V14 - Mostra resolvendo o __Caso 3__ e __Caso 5__: Pedro Assina o plano trimestral e Luiz assina o plano promocional -> 
-- [X] V15 - Mostra resolvendo o __Caso 4__: Marcos alterando a forma de pagamento de um plano -> 
-- [X] V16 - Mostra resolvendo o __Caso 6__: Ricardo cancela a assinatura -> 
-- [X] V17 - Considerações sobre o desafio e agradecimentos -> https://youtu.be/G4S8gRoNFes
+- [X] V1 - Introdução ao desafio da SANAR -> https://youtu.be/yAebkI22JlE
+- [X] V2 - Introdução ao Docker para rodar Postgresql -> - https://youtu.be/DjRgbIwcFH8
+- [X] V3 - Introdução às chaves de acesso da MultipagG e criando ambiente de testes e ambiente de desenvolvimento-> https://youtu.be/TVGXyugom3A
+- [X] V4 - Clonando e Configurando a API SanarPay e Rodando os testes automatizados-> https://youtu.be/oMrYJl_O4n4
+- [X] V5 - Introdução à estrutura da API SanarPay, arquivos e pastas -> https://youtu.be/FdkX1_0RG7c
+- [X] V6 - Rodando tudo com o Insomnia __Desafio Sanar__ parte 1-> https://youtu.be/yj3ZPtaVWtI
+- [X] V7 - Rodando tudo com o Insomnia __Desafio Sanar__ parte 2-> https://youtu.be/qjhbu7RlUuo
+
 
 # Rodando a aplicação
 
@@ -212,9 +206,10 @@ Ao clicar em ```Send```, deverá retornar algo como:
   "customer": {
     "id": 0,
     "name": "Administrador",
-    "email": "admin@sanarflix.com.br"
+    "email": "admin@sanarflix.com.br",
+    "remote_id": null
   },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwiaWF0IjoxNTc5NDc3NjcxLCJleHAiOjE1ODAwODI0NzF9.MF-vqtjN1wSuZkWcLzvF2hRE2PtJlP6J6IivBZfLBCY"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwicmVtb3RlX2lkIjpudWxsLCJpYXQiOjE1Nzk4ODY1ODAsImV4cCI6MTU4MDQ5MTM4MH0.AkhvzxaVK5yW4oybVE1RpEeViWXHE4_TwaWBEIDu8J0"
 }
 ```
 ## Pra criar um usuário usando o Insomnia:
@@ -230,15 +225,23 @@ Dentro da pasta ```CUSTOMER``` Criar uma requisicao do tipo ```POST  ${base_url}
 Ao clicar em ```Send```, deverá retornar algo como:
 ```js
 {
-  "id": 1,
+  "id": "cus_kwxoMmof3Txw4Zaz",
   "name": "Almerindo Rehem",
   "email": "almerindo.rehem@gmail.com",
-  "password": "1234567890",
-  "remote_id": "cus_WM4KXxxc64t5K8GP",
-  "updatedAt": "2020-01-20T00:21:21.520Z",
-  "createdAt": "2020-01-20T00:21:20.030Z",
-  "password_hash": "$2a$08$yZoBV29nKw9UVyVaiW18E.jf85CzxPVwpa5aKI/SmSr7ByCTqk6Mu",
-  "canceled_at": null
+  "delinquent": false,
+  "created_at": "2020-01-24T17:23:53Z",
+  "updated_at": "2020-01-24T17:23:53Z",
+  "document": null,
+  "type": null,
+  "fb_access_token": null,
+  "address": null,
+  "metadata": null,
+  "phones": {
+    "home_phone": null,
+    "mobile_phone": null
+  },
+  "fb_id": null,
+  "code": null
 }
 ```
 
@@ -257,45 +260,67 @@ Ao clicar em ```Send```, deverá retornar algo como:
 
 # Exemplos de rotas e requisições com dados JSON para serem eviados para a API:
 
-## POST /customers/wallet  - Rota para criar cartão de crédito na Wallet do usuário 
+## POST /customers/:cus/wallet  - Rota para criar cartão de crédito na Wallet do usuário 
 
 ### Exemplo de dados a ser enviado no corpo da requisição:
 ```js
- {
-	 "card": {
-        "number": "4011185771285580",
-        "holder_name": "Tony Stark",
-        "holder_document": "93095135270",
-        "exp_month": 1,
+{
+	"password": "1234567890",
+	"card": {
+        "number": "5259338724595542",
+        "holder_name": "Juliana Paz",
+        "holder_document": "44743100046",
+        "exp_month": 10,
         "exp_year": 20,
-        "cvv": "651",
+        "cvv": "403",
         "brand": "Mastercard",
         "private_label": false,
         "options": {
             "verify_card": true
         }
  	 }
- }
-```
-
-```js
-
-{
-  "card":{
-      "number": "4000000000000010",
-      "holder_name": "Tony Stark",
-      "holder_document": "93095135270",
-      "exp_month": 1,
-      "exp_year": 20,
-      "cvv": "351",
-      "brand": "Mastercard",
-      "private_label": false,
-      "options": {
-          "verify_card": true
-      }
-  }
 }
 ```
+ __Exemplo de retorno:__
+```js
+{
+  "id": "card_JZ7gLGwCw2fjGr0b",
+  "last_four_digits": "5542",
+  "brand": "Mastercard",
+  "holder_name": "Juliana Paz",
+  "exp_month": 10,
+  "exp_year": 2020,
+  "status": "active",
+  "created_at": "2020-01-24T17:29:02Z",
+  "updated_at": "2020-01-24T17:29:02Z",
+  "billing_address": null,
+  "customer": {
+    "id": "cus_8O2R0nXI6wS8oKBw",
+    "name": "Juliaana Paz",
+    "email": "julianapaz@gmail.com",
+    "delinquent": false,
+    "created_at": "2020-01-24T16:29:55Z",
+    "updated_at": "2020-01-24T16:29:55Z",
+    "document": null,
+    "type": null,
+    "fb_access_token": null,
+    "address": null,
+    "metadata": null,
+    "phones": {
+      "home_phone": null,
+      "mobile_phone": null
+    },
+    "fb_id": null,
+    "code": null
+  },
+  "metadata": null,
+  "type": "credit",
+  "holder_document": "44743100046",
+  "deleted_at": null,
+  "first_six_digits": "525933"
+}
+```
+
 
 ### Caso deseje criar novos cartões de créditos para testar, user o link:
 
@@ -314,6 +339,8 @@ __Obs! Somente o administrador pode cadastrar planos!__
 
 ```js
 {
+  "password":"1234567890",
+
   "name": "Plano Standard",
   "currency": "BRL",
   "interval": "month",
@@ -338,6 +365,8 @@ __Obs! Somente o administrador pode cadastrar planos!__
 ```js
 
 {
+  "password":"1234567890",
+
   "name": "Plano Standard 7Days Trial",
   "currency": "BRL",
   "interval": "month",
@@ -365,6 +394,9 @@ __Obs! Somente o administrador pode cadastrar planos!__
   ```js
 
  {
+  "password":"1234567890",
+
+
   "name": "Plano Trimestral",
   "currency": "BRL",
   "interval": "month",
@@ -389,6 +421,8 @@ __Obs! Somente o administrador pode cadastrar planos!__
 ```js
 
   {
+  "password":"1234567890",
+
   "name": "Promocional Sanarflix + Livro Yellowbook,",
   "currency": "BRL",
   "interval": "month",
@@ -416,32 +450,33 @@ __Obs! Somente o administrador pode cadastrar planos!__
   }
   ```
 
- ## POST /customers/subscriptions - Para assinar um plano
+ ## POST   /customers/:cus/subscriptions - Para assinar um plano
 
  ### Exemplo de dados a ser enviado no corpo da requisição:
 
  ```js
 {
-	"plan_id":"plan_qReWwBOfGsO0zkr1",
-	"payment_method":"credit_card",
-	"card_id": "card_Ol1zG91UaTBnGBRa"
+"password":"1234567890",
+	"cardId":"card_JZ7gLGwCw2fjGr0b",
+	"planId": "plan_MY9JVgzSL2cAv0qG",
+	"paymentMethod":"credit_card"
 }
  ```
 ___O retorno seria algo do tipo:___
 
 ```js
 {
-  "id": "sub_36N2JAAc5ziOpBgD",
-  "code": "RQ30TD4INZ",
-  "start_at": "2020-01-21T00:00:00Z",
+  "id": "sub_dzPLxPjswYfvbeyD",
+  "code": "RPWQS5GAOO",
+  "start_at": "2020-01-24T00:00:00Z",
   "interval": "month",
   "interval_count": 1,
   "billing_type": "prepaid",
   "current_cycle": {
-    "start_at": "2020-01-21T00:00:00Z",
-    "end_at": "2020-02-20T23:59:59Z",
-    "id": "cycle_AdovM6vu5pfxMbnE",
-    "billing_at": "2020-01-21T00:00:00Z",
+    "start_at": "2020-01-24T00:00:00Z",
+    "end_at": "2020-02-23T23:59:59Z",
+    "id": "cycle_Jg510ETB3hYXA8OM",
+    "billing_at": "2020-01-24T00:00:00Z",
     "subscription": null,
     "status": "billed",
     "duration": null,
@@ -453,15 +488,15 @@ ___O retorno seria algo do tipo:___
   "currency": "BRL",
   "installments": 1,
   "status": "failed",
-  "created_at": "2020-01-21T15:55:51Z",
-  "updated_at": "2020-01-21T15:55:51Z",
+  "created_at": "2020-01-24T17:39:01Z",
+  "updated_at": "2020-01-24T17:39:01Z",
   "customer": {
-    "id": "cus_0k4gdV0hJCDmMDvE",
-    "name": "Marcos Santana",
-    "email": "marcossantana@gmail.com",
+    "id": "cus_8O2R0nXI6wS8oKBw",
+    "name": "Juliaana Paz",
+    "email": "julianapaz@gmail.com",
     "delinquent": false,
-    "created_at": "2020-01-21T14:59:09Z",
-    "updated_at": "2020-01-21T14:59:09Z",
+    "created_at": "2020-01-24T16:29:55Z",
+    "updated_at": "2020-01-24T16:29:55Z",
     "document": null,
     "type": null,
     "fb_access_token": null,
@@ -472,33 +507,33 @@ ___O retorno seria algo do tipo:___
       "mobile_phone": null
     },
     "fb_id": null,
-    "code": "4"
+    "code": null
   },
   "card": {
-    "id": "card_Ol1zG91UaTBnGBRa",
-    "last_four_digits": "0347",
+    "id": "card_JZ7gLGwCw2fjGr0b",
+    "last_four_digits": "5542",
     "brand": "Mastercard",
-    "holder_name": "Marcos Santana",
-    "exp_month": 3,
-    "exp_year": 2021,
+    "holder_name": "Juliana Paz",
+    "exp_month": 10,
+    "exp_year": 2020,
     "status": "active",
-    "created_at": "2020-01-21T15:47:31Z",
-    "updated_at": "2020-01-21T15:49:13Z",
+    "created_at": "2020-01-24T17:29:02Z",
+    "updated_at": "2020-01-24T17:29:02Z",
     "billing_address": null,
     "customer": null,
     "metadata": null,
     "type": "credit",
-    "holder_document": null,
+    "holder_document": "44743100046",
     "deleted_at": null,
-    "first_six_digits": "559590"
+    "first_six_digits": "525933"
   },
   "items": [
     {
-      "id": "si_O6QJkEzYFrt1Mxjb",
+      "id": "si_NeYdWmImRIEkwMn0",
       "description": "Sanar Flix",
       "status": "active",
-      "created_at": "2020-01-21T15:55:51Z",
-      "updated_at": "2020-01-21T15:55:51Z",
+      "created_at": "2020-01-24T17:39:01Z",
+      "updated_at": "2020-01-24T17:39:01Z",
       "pricing_scheme": {
         "price": 2450,
         "scheme_type": "unit",
@@ -515,7 +550,7 @@ ___O retorno seria algo do tipo:___
   "metadata": null,
   "setup": null,
   "gateway_affiliation_id": null,
-  "next_billing_at": "2020-02-21T00:00:00Z",
+  "next_billing_at": "2020-02-24T00:00:00Z",
   "billing_day": null,
   "minimum_price": 2450,
   "canceled_at": null,
@@ -523,7 +558,7 @@ ___O retorno seria algo do tipo:___
 }
 ```
 
-## DELETE /customers/subscriptions - Cancelar uma assinatura
+## DELETE   /customers/:cus/subscriptions/:sub - Cancelar a assinatura :sub do usuário :cus
 
  ### Exemplo de dados a ser enviado no corpo da requisição:
 
