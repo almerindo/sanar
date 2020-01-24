@@ -1,7 +1,5 @@
 import * as Yup from 'yup';
-import { Op } from 'sequelize';
 
-import Customer from '../models/Customer';
 import Card from '../models/Card';
 
 import MundiPagg from './util/MundiPagg';
@@ -35,7 +33,10 @@ class WalletController {
       return res
         .status(400)
         .json(
-          `Cartao (Ultimos 4 Numeros: ${card.number}) já foi cadastrado para este cliente`
+          `Cartao (Ultimos 4 Numeros: ${card.number.substring(
+            card.number.length - 4,
+            card.number.length
+          )}) já foi cadastrado para este cliente`
         );
     }
 
