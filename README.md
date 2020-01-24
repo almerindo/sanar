@@ -39,9 +39,11 @@ Ou seja, inicialmente um administrador ( usuário master da Sanarflix) criará 4
 
 * Promocional Sanarflix + Livro Yellowbook​
 
-A API permite que um usuário crie sua conta, apenas informando seu e-mail e senha.​
+A API permite que um usuário (cliente) crie sua conta, apenas informando seu e-mail e senha.​
 
-A API permite que o usuário logado ( com token JWT) adicione um ou mais cartões em sua carteira virtual (Wallet)​
+A API permite que o usuário logado ( com token JWT) adicione um ou mais cartões em sua carteira virtual (Wallet)​. 
+
+#### Qualquer manipulação de dados do usuário (seja ele admin ou cliente), será necessário informar o token jwt e a senha do usuário para que a API verifique se é possível executar tal tarefa.
 
 
 ### Com usuário criado e com cartão cadastrado​
@@ -65,31 +67,31 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 
 # Vídeos demonstrativos de como instalar, configurar e usar todo o ambiente e a API implementada: 
 ## Playlist no youtube só sobre o desafio SanarFlix, pode ser acessada em: https://www.youtube.com/playlist?list=PLWgTXjuvJE-bnv5mMhWWu3b5lWALBBTcn ou individualmente em cada um dos links a seguir conforme seu tema:
-- [X] V1 - Introdução ao desafio da SANAR -> https://youtu.be/14SkrVDg-hc
-- [X] V2 - Introdução ao Docker para rodar Postgresql -> https://youtu.be/g1_16AFXQfs
-- [X] V3 - Introdução às estruturas do VSCode e os testes de integração -> https://youtu.be/b9rphiBXVuY
-- [X] V4 - Introdução à estrutura da API, arquivos e pastas -> https://youtu.be/YvbiX4nG2lA
-- [X] V5 - Explicando as rotas da API desenvolvida -> https://youtu.be/zo5C8RtIjfA
-- [X] V6 - Introdução às chaves de acesso da MultipagG -> https://youtu.be/YZZ-EjpbwXI
-- [X] V7 - Pegando a chave de teste da MultipagG -> https://youtu.be/FDjo3_-iNjs
-- [X] V8 - Criando um Cliente e se logando com ele -> https://youtu.be/1XFwVXdJO0Y
-- [X] V9 - Criando Planos de assinaturas com itens e preços -> https://youtu.be/u46uNc4mG5s
-- [X] V10 - Criando os exemplos de uso passado no __Desafio__ -> https://youtu.be/jU7m2XPJ1iU
-- [X] V11 - Mostra como agilizar os testes, cadastrando no Insomnia, os tokens em variáveis de ambiente -> https://youtu.be/z7wbh2MmT10
-- [X] V12 - Mostra resolvendo o __Caso 1__: Mario assina o plano Standard -> https://youtu.be/NUODsKoPw6g
-- [X] V13 - Mostra resolvendo o __Caso 2__: Juliana assina o plano Trial 7D -> https://youtu.be/cnBnnfbsw6o
-- [X] V14 - Mostra resolvendo o __Caso 3__ e __Caso 5__: Pedro Assina o plano trimestral e Luiz assina o plano promocional -> https://youtu.be/I8aTL7p8Bmw
-- [X] V15 - Mostra resolvendo o __Caso 6__: Ricardo cancela a assinatura -> https://youtu.be/VCPEdtT0CEQ
-- [X] V16 - Mostra resolvendo o __Caso 4__: Marcos alterando a forma de pagamento de um plano -> https://youtu.be/24k5BvHm7Rg
+- [X] V1 - Introdução ao desafio da SANAR -> 
+- [X] V2 - Introdução ao Docker para rodar Postgresql -> -
+- [X] V3 - Introdução às chaves de acesso da MultipagG e criando ambiente de testes e ambiente de desenvolvimento-> 
+- [X] V4 - Clonando e Configurando a API SanarPay e Rodando os testes automatizados-> 
+- [X] V5 - Introdução à estrutura da API SanarPay, arquivos e pastas -> 
+- [X] V6 - Explicando as rotas da API SanarPay desenvolvida -> 
+- [X] V7 - Configurando, os tokens, variáveis de ambiente e as requisições, do Insomnia para rodar os exemplos do __Desafio Sanar__ ->
+- [X] V8 - Criando os Planos de assinaturas com itens e preços do __Desafio Sanar__ ->
+- [X] V12 - Mostra resolvendo o __Caso 1__: Mario assina o plano Standard -> 
+- [X] V13 - Mostra resolvendo o __Caso 2__: Juliana assina o plano Trial 7D -> 
+- [X] V14 - Mostra resolvendo o __Caso 3__ e __Caso 5__: Pedro Assina o plano trimestral e Luiz assina o plano promocional -> 
+- [X] V15 - Mostra resolvendo o __Caso 4__: Marcos alterando a forma de pagamento de um plano -> 
+- [X] V16 - Mostra resolvendo o __Caso 6__: Ricardo cancela a assinatura -> 
 - [X] V17 - Considerações sobre o desafio e agradecimentos -> https://youtu.be/G4S8gRoNFes
 
 # Rodando a aplicação
 
-## Clonando a API:
+## Clonando a API e fazendo o checkout na branch __dev__:
 ```js
 ❯ mkdir desafiosanar
 ❯ cd ./desafiosanar
 ❯ git clone https://github.com/almerindo/sanar.git sanarDEMO
+❯ git branch
+❯ git checkout dev
+❯ git branch
 ```
 
 Entre no diretório que voce clonou do github, rode o yarn para verificar as dependencias 
@@ -148,11 +150,11 @@ Para configurar o ambiente de testes, banco de dados, edite o arquivo .env.test 
 
 Importante ressaltar que é aconselhável rodar os testes em um outro ambiente isolado. Então, você pode criar uma outra conta de testes na MundiPaG para todar os testes sem interferir na sua base de desenvolvimento.
 
-Ao rodar os testes, a nossa API irá ler do arquivo de configuração .env.test. Ou seja, altere o arquivo .env.test em ./sanarDEMO/sanarPay/server/ conforme sua necessidade.
+Ao rodar os testes, a nossa API irá ler do arquivo de configuração __.env.test__. Ou seja, altere o arquivo __.env.test__ em __./sanarDEMO/sanarPay/server/__ conforme sua necessidade.
 
 ### Note que o banco de dados para os testes é o sqllite, e ele é apagado e reconstruíto todas as vezes que você roda a suite de teste.
 
-__Um exemplo do arquivo .env.test seria:__
+#### Um exemplo do arquivo .env.test seria:
 
 ```properties
 APP_URL=http://localhost:3333
@@ -168,7 +170,7 @@ DB_DIALECT=sqlite
 # API mundipagg-nodejs
 #sk_test_RYwm6wBcMjt387nb
 
-MUNDI_PK=sk_test_JvxAOZeiKsowrGKB
+MUNDI_PK=sk_test_SUACHAVEDETESTE
 
 ```
 
@@ -178,13 +180,6 @@ Agora rode os testes automatizados com o seguinte comando:
 ```js
 ❯ yarn test
 ```
-Ou 
-
-Para interagir com a suite de testes:
-```js
-yarn test:watch
-```
-
 
 
 # Usando a API com o Insomnia
