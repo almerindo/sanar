@@ -42,6 +42,7 @@ class SessionController {
         id,
         name,
         email,
+        remote_id,
       },
       token: jwt.sign({ id, remote_id }, authConfig.secret, {
         expiresIn: authConfig.expiresIn,
