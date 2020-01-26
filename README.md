@@ -76,6 +76,21 @@ A API permite que o usuário logado ( com token JWT) adicione um ou mais cartõe
 - [X] V7 - Rodando tudo com o Insomnia __Desafio Sanar__ parte 2-> https://youtu.be/qjhbu7RlUuo
 
 
+# Rodando a aplicação usando o docker e docker-compose
+
+```js
+❯ mkdir desafiosanar
+❯ cd ./desafiosanar
+❯ git clone https://github.com/almerindo/sanar.git sanarDEMO
+❯ cd ./sanarDEMO/sanarPay/server/
+❯ git branch
+❯ git checkout dev
+
+❯ docker-compose up -d --build
+❯ docker-compose exec sanar-api yarn dev:init 
+
+```
+
 # Rodando a aplicação
 
 ## Clonando a API e fazendo o checkout na branch __dev__:
